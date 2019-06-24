@@ -142,5 +142,78 @@ namespace ShaderSim.Mathematics
                 }
             }
         }
+
+        public float this[int column, int row]
+        {
+            get
+            {
+                switch (column)
+                {
+                    case 0:
+                        return Column0[row];
+                    case 1:
+                        return Column1[row];
+                    case 2:
+                        return Column2[row];
+                    case 3:
+                        return Column3[row];
+                    default:
+                        throw new IndexOutOfRangeException();
+                }
+            }
+            set
+            {
+                switch (column)
+                {
+                    case 0:
+                        Column0[row] = value;
+                        break;
+                    case 1:
+                        Column1[row] = value;
+                        break;
+                    case 2:
+                        Column2[row] = value;
+                        break;
+                    case 3:
+                        Column3[row] = value;
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException();
+                }
+            }
+        }
+
+        public static Matrix4x4 operator *(Matrix4x4 a, Matrix4x4 b)
+        {
+            Matrix4x4 output = new Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    for (int k = 0; k < 4; k++)
+                    {
+                        output[k, i] += a[i, j] * b[j, k];
+                    }
+                }
+            }
+
+            return output;
+        }
+
+        public static Vector4 operator *(Vector4 a, Matrix4x4 b)
+        {
+            Vector4 output = new Vector4(0, 0, 0, 0);
+
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    output[i] += a[i] * b[i, j];
+                }
+            }
+
+            return output;
+        }
     }
 }

@@ -1,11 +1,6 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ShaderSim
+namespace ShaderSim.Mathematics
 {
     public struct Vector2
     {
