@@ -51,7 +51,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ShaderSim\ShaderUtils.csproj">
+    <ProjectReference Include="..\ShaderUtils\ShaderUtils.csproj">
       <Project>{2927b365-e622-487f-b0d5-c5a59b688209}</Project>
       <Name>ShaderUtils</Name>
     </ProjectReference>
