@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ShaderSim.Mathematics
 {
@@ -94,6 +90,28 @@ namespace ShaderSim.Mathematics
             set => Column3[3] = value;
         }
 
+        /// <summary>
+        /// Creates a matrix with all 0 and "value" for each value on the diagonal line
+        /// </summary>
+        /// <param name="value">values on the diagonal of the matrix</param>
+        public Matrix4x4(float value) : this(value, 0, 0, 0, 0, value, 0, 0, 0, 0, value, 0, 0, 0, 0, value)
+        {
+        }
+
+        /// <summary>
+        /// creates the matrix with the 4 columns set
+        /// </summary>
+        /// <param name="c0">column 0</param>
+        /// <param name="c1">column 1</param>
+        /// <param name="c2">column 2</param>
+        /// <param name="c3">column 3</param>
+        public Matrix4x4(Vector4 c0, Vector4 c1, Vector4 c2, Vector4 c3)
+        {
+            Column0 = c0;
+            Column1 = c1;
+            Column2 = c2;
+            Column3 = c3;
+        }
 
         public Matrix4x4(float m00, float m10, float m20, float m30, float m01, float m11, float m21, float m31, float m02, float m12, float m22, float m32, float m03, float m13, float m23, float m33)
         {
@@ -185,7 +203,7 @@ namespace ShaderSim.Mathematics
 
         public static Matrix4x4 operator *(Matrix4x4 a, Matrix4x4 b)
         {
-            Matrix4x4 output = new Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+            Matrix4x4 output = new Matrix4x4(0);
 
             for (int i = 0; i < 4; i++)
             {
