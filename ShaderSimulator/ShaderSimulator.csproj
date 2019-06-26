@@ -44,6 +44,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RenderSimulator.cs" />
+    <Compile Include="SimulatorVAO.cs" />
     <Compile Include="TestShader.cs" />
     <Compile Include="TestVAO.cs" />
   </ItemGroup>

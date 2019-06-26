@@ -8,7 +8,8 @@ namespace ShaderSimulator
     {
         public int IDLength { get; }
         public int PrimitiveType { get; set; }
-        public int DrawElementsType { get; }
+        public Type DrawElementsType { get; }
+
         public void SetIndex<T>(IEnumerable<T> data) where T : struct
         {
             //throw new NotImplementedException();
