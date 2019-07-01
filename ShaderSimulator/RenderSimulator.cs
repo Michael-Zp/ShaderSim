@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.Remoting;
 using ShaderSim;
+using ShaderSim.Attributes;
 
 namespace ShaderSimulator
 {
@@ -14,6 +16,7 @@ namespace ShaderSimulator
 
         private Shader _activeVertexShader;
         private Shader _activeFragmentShader;
+        private IVertexArrayObject _activeVAO;
 
         public RenderSimulator()
         {
@@ -101,9 +104,33 @@ namespace ShaderSimulator
             _activeFragmentShader = null;
         }
 
-        public void DrawElementsInstanced(IVertexArrayObject vao, int instanceCount)
+        public void ActivateVAO(IVertexArrayObject vao)
         {
+            _activeVAO = vao;
+        }
 
+        public void DeactivateVAO()
+        {
+            _activeVAO = null;
+        }
+
+        public void DrawElementsInstanced(int instanceCount)
+        {
+            SetUniforms();
+        }
+
+        private void SetUniforms()
+        {
+            MethodInfo method = typeof(Shader).GetMethod("SetValue");
+            if (method != null)
+            {
+                foreach (var uniform in _uniforms)
+                {
+                    MethodInfo generic = method.MakeGenericMethod(typeof(UniformAttribute), uniform.Value.GetType());
+                    generic.Invoke(_activeVertexShader, new object[] { uniform.Key, uniform.Value });
+                    generic.Invoke(_activeFragmentShader, new object[] { uniform.Key, uniform.Value });
+                }
+            }
         }
     }
 }

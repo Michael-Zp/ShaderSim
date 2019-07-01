@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\UniformAttribute.cs" />
+    <Compile Include="Attributes\OutAttribute.cs" />
+    <Compile Include="Attributes\InAttribute.cs" />
     <Compile Include="DefaultMesh.cs" />
     <Compile Include="IVertexArrayObject.cs" />
     <Compile Include="Mathematics\Matrix4x4.cs" />

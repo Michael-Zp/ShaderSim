@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using System.Runtime.Remoting.Channels;
+using ShaderSim.Attributes;
 
 namespace ShaderSim
 {
@@ -8,23 +10,22 @@ namespace ShaderSim
     {
         public abstract void Main();
 
-        public void SetValue<T>(string name, T value) where T : struct
+        public void SetValue<TAttribute, TValue>(string name, TValue value) where TAttribute : Attribute where TValue : struct
         {
-            GetType().GetProperty(name)?.SetValue(this, value);
+            if (GetType().GetProperty(name) != null)
+            {
+                if (GetType().GetProperty(name).GetCustomAttribute<TAttribute>() != null)
+                {
+                    GetType().GetProperty(name)?.SetValue(this, value);
+                }
+            }
         }
 
-        public IEnumerable<KeyValuePair<string, object>> GetValues()
+        public IEnumerable<KeyValuePair<string, object>> GetOutValues()
         {
             IEnumerable<PropertyInfo> properties = GetType().GetProperties();
 
-            Dictionary<string, object> values = new Dictionary<string, object>();
-
-            foreach (var property in properties)
-            {
-                values.Add(property.Name, property.GetValue(this));
-            }
-
-            return values;
+            return properties.Where(property => property.GetCustomAttribute<OutAttribute>() != null).ToDictionary(property => property.Name, property => property.GetValue(this));
         }
     }
 }
