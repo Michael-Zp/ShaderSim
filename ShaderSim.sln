@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderUtils", "ShaderUtils\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderSimulator", "ShaderSimulator\ShaderSimulator.csproj", "{DEFD3051-7C0D-4401-B26E-28392F6500E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderExample", "ShaderExample\ShaderExample.csproj", "{30E56217-63BD-45EE-8165-11CD9B019A12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderRenderer", "ShaderRenderer\ShaderRenderer.csproj", "{C2CBD03B-735E-4E2A-844E-EE5CCBCA2EFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{DEFD3051-7C0D-4401-B26E-28392F6500E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEFD3051-7C0D-4401-B26E-28392F6500E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DEFD3051-7C0D-4401-B26E-28392F6500E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30E56217-63BD-45EE-8165-11CD9B019A12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30E56217-63BD-45EE-8165-11CD9B019A12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30E56217-63BD-45EE-8165-11CD9B019A12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30E56217-63BD-45EE-8165-11CD9B019A12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2CBD03B-735E-4E2A-844E-EE5CCBCA2EFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2CBD03B-735E-4E2A-844E-EE5CCBCA2EFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2CBD03B-735E-4E2A-844E-EE5CCBCA2EFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2CBD03B-735E-4E2A-844E-EE5CCBCA2EFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

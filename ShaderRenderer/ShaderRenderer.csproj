@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DEFD3051-7C0D-4401-B26E-28392F6500E6}</ProjectGuid>
+    <ProjectGuid>{C2CBD03B-735E-4E2A-844E-EE5CCBCA2EFE}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>ShaderSimulator</RootNamespace>
-    <AssemblyName>ShaderSimulator</AssemblyName>
+    <RootNamespace>ShaderRenderer</RootNamespace>
+    <AssemblyName>ShaderRenderer</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -46,17 +46,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RenderSimulator.cs" />
-    <Compile Include="SimulatorVAO.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ShaderUtils\ShaderUtils.csproj">
-      <Project>{2927b365-e622-487f-b0d5-c5a59b688209}</Project>
-      <Name>ShaderUtils</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
