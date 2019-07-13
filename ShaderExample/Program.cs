@@ -8,18 +8,23 @@ namespace ShaderExample
     {
         static void Main(string[] args)
         {
-            Mesh testMesh = new DefaultMesh();
-            testMesh.IDs.Add(0);
-            testMesh.AddAttributeValue("Position", new Vector3(1));
-            ((DefaultMesh)testMesh).Normal.Add(new Vector3(1));
-            ((DefaultMesh)testMesh).Normal.Add(new Vector3(15));
+            DefaultMesh triangle = new DefaultMesh();
+            triangle.Position.Add(new Vector3(0f));
+            triangle.Position.Add(new Vector3(0.2f, 0.2f, 0f));
+            triangle.Position.Add(new Vector3(0f, 0.2f, 0f));
+            triangle.IDs.Add(0);
+            triangle.IDs.Add(1);
+            triangle.IDs.Add(2);
+
+
             RenderSimulator simulator = new RenderSimulator();
-            PassVertex testShader = new PassVertex();
-            SimulatorVAO vao = VAOLoader.FromMesh<SimulatorVAO>(testMesh, testShader, new object[] { simulator });
-            vao.SetAttribute("Test", testShader, new float[] { 2.5f }, true);
-            simulator.ActivateShader(testShader, new PassFragment());
+            PassVertex vertexShader = new PassVertex();
+            SimulatorVAO vao = VAOLoader.FromMesh<SimulatorVAO>(triangle, vertexShader, new object[] { simulator });
+            vao.SetAttribute("InstancePosition", vertexShader, new Vector3[] { new Vector3(0f), new Vector3(0.5f, 0.5f, 0f) }, true);
+            vao.SetAttribute("Color", vertexShader, new Vector4[] { new Vector4(1f), new Vector4(0.5f, 0.5f, 0.5f, 1f) }, true);
+            simulator.ActivateShader(vertexShader, new PassFragment());
             simulator.ActivateVAO(vao);
-            simulator.DrawElementsInstanced();
+            simulator.DrawElementsInstanced(2);
         }
     }
 }

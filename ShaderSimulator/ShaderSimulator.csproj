@@ -53,6 +53,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ShaderRenderer\ShaderRenderer.csproj">
+      <Project>{c2cbd03b-735e-4e2a-844e-ee5ccbca2efe}</Project>
+      <Name>ShaderRenderer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ShaderUtils\ShaderUtils.csproj">
       <Project>{2927b365-e622-487f-b0d5-c5a59b688209}</Project>
       <Name>ShaderUtils</Name>

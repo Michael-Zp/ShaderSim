@@ -7,10 +7,10 @@ namespace ShaderExample
     class PassFragment : Shader
     {
         [In]
-        public Vector3 Col { private get; set; }
+        public Vector4 Col { private get; set; }
 
         [Out]
-        public Vector3 Color { get; private set; }
+        public Vector4 Color { get; private set; }
 
         public override void Main()
         {
