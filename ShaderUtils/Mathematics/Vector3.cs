@@ -638,5 +638,15 @@ namespace ShaderSim.Mathematics
                 Z = (float)(a / b.Z),
             };
         }
+
+        public static implicit operator System.Numerics.Vector3(Vector3 vec)
+        {
+            return new System.Numerics.Vector3(vec.X, vec.Y, vec.Z);
+        }
+
+        public static explicit operator Vector3(System.Numerics.Vector3 vec)
+        {
+            return new Vector3(vec.X, vec.Y, vec.Z);
+        }
     }
 }

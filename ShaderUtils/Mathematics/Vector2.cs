@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Remoting.Messaging;
 
 namespace ShaderSim.Mathematics
 {
@@ -340,5 +341,18 @@ namespace ShaderSim.Mathematics
                 Y = (float)(a / b.Y),
             };
         }
+        public static implicit operator System.Numerics.Vector2(Vector2 vec)
+        {
+            return new System.Numerics.Vector2(vec.X, vec.Y);
+        }
+
+        public static explicit operator Vector2(System.Numerics.Vector2 vec)
+        {
+            return new Vector2(vec.X, vec.Y);
+        }
     }
+
+
 }
+
+

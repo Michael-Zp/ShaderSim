@@ -1,6 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Windows.Forms;
 using ShaderRenderer;
 using ShaderSim;
 using ShaderSim.Attributes;
@@ -21,7 +27,8 @@ namespace ShaderSimulator
         private IVertexArrayObject _activeVAO;
 
         private readonly Dictionary<string, IList> _vertexValues;
-        private Dictionary<string, IList[,]> _fragments;
+        private readonly List<Triangle> _primitives;
+        private Dictionary<string, IList>[,] _fragments;
 
         private Renderer _renderer;
 
@@ -37,7 +44,7 @@ namespace ShaderSimulator
             _setValueMethod = typeof(Shader).GetMethod("SetValue");
 
             _vertexValues = new Dictionary<string, IList>();
-            _fragments = new Dictionary<string, IList[,]>();
+            _primitives = new List<Triangle>();
         }
 
         public void SetRenderData(IVertexArrayObject vao, IEnumerable<uint> data)
@@ -132,7 +139,9 @@ namespace ShaderSimulator
         {
             SetUniforms();
             CalculateVertexStep(instanceCount);
+            GeneratePrimitives();
             CalculateFragments();
+            CalculateFragmentStep();
         }
 
         private void SetUniforms()
@@ -192,13 +201,29 @@ namespace ShaderSimulator
             generic.Invoke(shader, new object[] { name, value });
         }
 
+        private void GeneratePrimitives()
+        {
+            for (int i = 0; i < _vertexValues.First().Value.Count; i += 3)
+            {
+                Triangle triangle = new Triangle();
+                for (int j = 0; j < 3; j++)
+                {
+                    foreach (var key in _vertexValues.Keys)
+                    {
+                        triangle[j].Add(key, _vertexValues[key][i + j]);
+                    }
+                }
+                _primitives.Add(triangle);
+            }
+        }
+
         private void CalculateFragments()
         {
             Vector2[,] positions = new Vector2[_renderer.Width, _renderer.Height];
 
             foreach (var key in _vertexValues.Keys)
             {
-                _fragments.Add(key, new IList[_renderer.Width, _renderer.Height]);
+                _fragments = new Dictionary<string, IList>[_renderer.Width, _renderer.Height];
             }
 
             for (int x = 0; x < _renderer.Width; x++)
@@ -206,7 +231,30 @@ namespace ShaderSimulator
                 for (int y = 0; y < _renderer.Height; y++)
                 {
                     positions[x, y] = CalculatePosition(x, y);
-                    //TODO interpolate values
+                    foreach (var primitive in _primitives)
+                    {
+                        Vector3 baricentric = Barycentric(positions[x, y], primitive);
+                        if (baricentric.X >= 0 && baricentric.Y >= 0 && baricentric.Z >= 0)
+                        {
+                            _fragments[x, y] = new Dictionary<string, IList>();
+                            foreach (var key in _vertexValues.Keys)
+                            {
+                                if (!_fragments[x, y].ContainsKey(key))
+                                {
+                                    _fragments[x, y].Add(key, new List<object>());
+                                }
+
+                                MethodInfo mult = primitive[0][key].GetType().GetMethod("op_Multiply", new Type[] { primitive[0][key].GetType(), typeof(float) });
+                                MethodInfo add = primitive[0][key].GetType().GetMethod("op_Addition", new Type[] { primitive[0][key].GetType(), primitive[0][key].GetType() });
+                                var value0 = mult.Invoke(primitive[0][key], new object[] { primitive[0][key], baricentric.X });
+                                var value1 = mult.Invoke(primitive[1][key], new object[] { primitive[1][key], baricentric.Y });
+                                var value2 = mult.Invoke(primitive[2][key], new object[] { primitive[2][key], baricentric.Z });
+                                var add1 = add.Invoke(value0, new object[] { value0, value1 });
+                                var add2 = add.Invoke(add1, new object[] { add1, value2 });
+                                _fragments[x, y][key].Add(add2);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -215,12 +263,77 @@ namespace ShaderSimulator
         {
             Vector2 fragSize = new Vector2(2f / _renderer.Width, 2f / _renderer.Height);
 
-            return new Vector2(fragSize.X * x + fragSize.X / 2 - 1, fragSize.Y * y + fragSize.Y / 2 - 1);
+            return new Vector2(fragSize.X * x + fragSize.X / 2 - 1, -(fragSize.Y * y + fragSize.Y / 2 - 1));
+        }
+
+        private Vector3 Barycentric(System.Numerics.Vector2 pos, Triangle triangle)
+        {
+            System.Numerics.Vector2 t0 = new System.Numerics.Vector2(((Vector3)triangle[0]["Pos"]).X, ((Vector3)triangle[0]["Pos"]).Y);
+            System.Numerics.Vector2 t1 = new System.Numerics.Vector2(((Vector3)triangle[1]["Pos"]).X, ((Vector3)triangle[1]["Pos"]).Y);
+            System.Numerics.Vector2 t2 = new System.Numerics.Vector2(((Vector3)triangle[2]["Pos"]).X, ((Vector3)triangle[2]["Pos"]).Y);
+
+            System.Numerics.Vector2 v0 = t1 - t0;
+            System.Numerics.Vector2 v1 = t2 - t0;
+            System.Numerics.Vector2 v2 = pos - t0;
+
+            float d00 = System.Numerics.Vector2.Dot(v0, v0);
+            float d01 = System.Numerics.Vector2.Dot(v0, v1);
+            float d11 = System.Numerics.Vector2.Dot(v1, v1);
+            float d20 = System.Numerics.Vector2.Dot(v2, v0);
+            float d21 = System.Numerics.Vector2.Dot(v2, v1);
+            float denom = d00 * d11 - d01 * d01;
+
+            float v = (d11 * d20 - d01 * d21) / denom;
+            float w = (d00 * d21 - d01 * d20) / denom;
+            float u = 1 - v - w;
+
+            return new Vector3(u, v, w);
         }
 
         private void CalculateFragmentStep()
         {
-            //TODO implement Fragment step
+            Bitmap bmp = new Bitmap(_fragments.GetLength(0), _fragments.GetLength(1));
+            for (int x = 0; x < _fragments.GetLength(0); x++)
+            {
+                for (int y = 0; y < _fragments.GetLength(1); y++)
+                {
+                    if (_fragments[x, y] != null)
+                    {
+                        for (int i = 0; i < _fragments[x, y].Values.First().Count; i++)
+                        {
+                            foreach (var key in _fragments[x, y].Keys)
+                            {
+                                SetAttribute(_activeFragmentShader, key, _fragments[x, y][key][i]);
+                            }
+                            _activeFragmentShader.Main();
+                            foreach (var outValue in _activeFragmentShader.GetOutValues())
+                            {
+                                if (outValue.Key == "Color")
+                                {
+                                    Color color = Color.FromArgb((int)(((Vector4)outValue.Value).A * 255),
+                                        (int)(((Vector4)outValue.Value).R * 255),
+                                        (int)(((Vector4)outValue.Value).G * 255),
+                                        (int)(((Vector4)outValue.Value).B * 255));
+                                    bmp.SetPixel(x, y, color);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        bmp.SetPixel(x, y, Color.Black);
+                    }
+                }
+            }
+            Form form = new Form();
+            form.Text = "Image Viewer";
+            PictureBox pictureBox = new PictureBox();
+            pictureBox.Image = bmp;
+            form.Width = bmp.Width;
+            form.Height = bmp.Height;
+            pictureBox.Dock = DockStyle.Fill;
+            form.Controls.Add(pictureBox);
+            Application.Run(form);
         }
     }
 }

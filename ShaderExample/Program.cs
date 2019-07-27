@@ -20,11 +20,11 @@ namespace ShaderExample
             RenderSimulator simulator = new RenderSimulator();
             PassVertex vertexShader = new PassVertex();
             SimulatorVAO vao = VAOLoader.FromMesh<SimulatorVAO>(triangle, vertexShader, new object[] { simulator });
-            vao.SetAttribute("InstancePosition", vertexShader, new Vector3[] { new Vector3(0f), new Vector3(0.5f, 0.5f, 0f) }, true);
-            vao.SetAttribute("Color", vertexShader, new Vector4[] { new Vector4(1f), new Vector4(0.5f, 0.5f, 0.5f, 1f) }, true);
+            vao.SetAttribute("InstancePosition", vertexShader, new Vector3[] { new Vector3(0f, -0.5f, 0f), new Vector3(0f, -0.4f, 0f), new Vector3(0.5f, 0.5f, 0f), new Vector3(-0.5f, 0.5f, 0f) }, true);
+            vao.SetAttribute("Color", vertexShader, new Vector4[] { new Vector4(1f, 0f, 0f, 1f), new Vector4(1f, 1f, 0f, 1f), new Vector4(0f, 0f, 1f, 1f), new Vector4(0f, 1f, 0f, 1f) }, true);
             simulator.ActivateShader(vertexShader, new PassFragment());
             simulator.ActivateVAO(vao);
-            simulator.DrawElementsInstanced(2);
+            simulator.DrawElementsInstanced(4);
         }
     }
 }
