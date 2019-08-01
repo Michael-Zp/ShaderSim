@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\TranslationAttribute.cs" />
     <Compile Include="Attributes\UniformAttribute.cs" />
     <Compile Include="Attributes\OutAttribute.cs" />
     <Compile Include="Attributes\InAttribute.cs" />
@@ -61,6 +62,8 @@
     <Compile Include="Shader.cs" />
     <Compile Include="Mathematics\Vector2.cs" />
     <Compile Include="VAOLoader.cs" />
+    <Compile Include="FragmentShader.cs" />
+    <Compile Include="VertexShader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

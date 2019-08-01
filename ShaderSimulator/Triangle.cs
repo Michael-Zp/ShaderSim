@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using ShaderSim.Mathematics;
 
 namespace ShaderSimulator
 {
     class Triangle
     {
         private readonly Dictionary<string, object>[] _vertices;
-
         public Dictionary<string, object> this[int index] => _vertices[index];
 
         public Triangle()

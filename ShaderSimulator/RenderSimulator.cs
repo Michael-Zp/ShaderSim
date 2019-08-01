@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using ShaderRenderer;
 using ShaderSim;
@@ -16,18 +15,22 @@ namespace ShaderSimulator
 {
     public class RenderSimulator
     {
+        public bool DepthEnabled { get; set; } = true;
+
         private readonly Dictionary<IVertexArrayObject, IList<uint>> _renderData;
         private readonly Dictionary<string, object> _uniforms;
         private readonly Dictionary<Shader, Dictionary<string, IList>> _attributes;
         private readonly Dictionary<Shader, Dictionary<string, IList>> _instancedAttributes;
 
         private readonly MethodInfo _setValueMethod;
-        private Shader _activeVertexShader;
-        private Shader _activeFragmentShader;
+        private VertexShader _activeVertexShader;
+        private FragmentShader _activeFragmentShader;
         private IVertexArrayObject _activeVAO;
 
+        private readonly List<Vector4> _vertexPositions;
         private readonly Dictionary<string, IList> _vertexValues;
         private readonly List<Triangle> _primitives;
+        private List<float>[,] _depths;
         private Dictionary<string, IList>[,] _fragments;
 
         private Renderer _renderer;
@@ -43,6 +46,7 @@ namespace ShaderSimulator
 
             _setValueMethod = typeof(Shader).GetMethod("SetValue");
 
+            _vertexPositions = new List<Vector4>();
             _vertexValues = new Dictionary<string, IList>();
             _primitives = new List<Triangle>();
         }
@@ -113,7 +117,7 @@ namespace ShaderSimulator
             }
         }
 
-        public void ActivateShader(Shader vertex, Shader fragment)
+        public void ActivateShader(VertexShader vertex, FragmentShader fragment)
         {
             _activeVertexShader = vertex;
             _activeFragmentShader = fragment;
@@ -137,11 +141,28 @@ namespace ShaderSimulator
 
         public void DrawElementsInstanced(int instanceCount = 1)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Reset();
+            stopwatch.Start();
+
             SetUniforms();
             CalculateVertexStep(instanceCount);
             GeneratePrimitives();
             CalculateFragments();
-            CalculateFragmentStep();
+            Bitmap result = CalculateFragmentStep();
+
+            stopwatch.Stop();
+            Console.WriteLine($"Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.Milliseconds}");
+
+            Form form = new Form();
+            form.Text = "Image Viewer";
+            PictureBox pictureBox = new PictureBox();
+            pictureBox.Image = result;
+            form.Width = result.Width;
+            form.Height = result.Height;
+            pictureBox.Dock = DockStyle.Fill;
+            form.Controls.Add(pictureBox);
+            Application.Run(form);
         }
 
         private void SetUniforms()
@@ -180,6 +201,8 @@ namespace ShaderSimulator
 
                     _activeVertexShader.Main();
 
+                    _vertexPositions.Add(_activeVertexShader.Position);
+
                     foreach (var outValue in _activeVertexShader.GetOutValues())
                     {
                         if (_vertexValues.ContainsKey(outValue.Key))
@@ -208,6 +231,7 @@ namespace ShaderSimulator
                 Triangle triangle = new Triangle();
                 for (int j = 0; j < 3; j++)
                 {
+                    triangle[j].Add(VertexShader.PositionName, _vertexPositions[i + j]);
                     foreach (var key in _vertexValues.Keys)
                     {
                         triangle[j].Add(key, _vertexValues[key][i + j]);
@@ -221,10 +245,8 @@ namespace ShaderSimulator
         {
             Vector2[,] positions = new Vector2[_renderer.Width, _renderer.Height];
 
-            foreach (var key in _vertexValues.Keys)
-            {
-                _fragments = new Dictionary<string, IList>[_renderer.Width, _renderer.Height];
-            }
+            _depths = new List<float>[_renderer.Width, _renderer.Height];
+            _fragments = new Dictionary<string, IList>[_renderer.Width, _renderer.Height];
 
             for (int x = 0; x < _renderer.Width; x++)
             {
@@ -236,7 +258,19 @@ namespace ShaderSimulator
                         Vector3 baricentric = Barycentric(positions[x, y], primitive);
                         if (baricentric.X >= 0 && baricentric.Y >= 0 && baricentric.Z >= 0)
                         {
-                            _fragments[x, y] = new Dictionary<string, IList>();
+                            if (_depths[x, y] == null)
+                            {
+                                _depths[x, y] = new List<float>();
+                            }
+
+                            _depths[x, y].Add(((Vector4)primitive[0][VertexShader.PositionName]).Z * baricentric.X +
+                                            ((Vector4)primitive[1][VertexShader.PositionName]).Z * baricentric.Y +
+                                            ((Vector4)primitive[2][VertexShader.PositionName]).Z * baricentric.Z);
+
+                            if (_fragments[x, y] == null)
+                            {
+                                _fragments[x, y] = new Dictionary<string, IList>();
+                            }
                             foreach (var key in _vertexValues.Keys)
                             {
                                 if (!_fragments[x, y].ContainsKey(key))
@@ -268,9 +302,9 @@ namespace ShaderSimulator
 
         private Vector3 Barycentric(System.Numerics.Vector2 pos, Triangle triangle)
         {
-            System.Numerics.Vector2 t0 = new System.Numerics.Vector2(((Vector3)triangle[0]["Pos"]).X, ((Vector3)triangle[0]["Pos"]).Y);
-            System.Numerics.Vector2 t1 = new System.Numerics.Vector2(((Vector3)triangle[1]["Pos"]).X, ((Vector3)triangle[1]["Pos"]).Y);
-            System.Numerics.Vector2 t2 = new System.Numerics.Vector2(((Vector3)triangle[2]["Pos"]).X, ((Vector3)triangle[2]["Pos"]).Y);
+            System.Numerics.Vector2 t0 = new System.Numerics.Vector2(((Vector4)triangle[0][VertexShader.PositionName]).X, ((Vector4)triangle[0][VertexShader.PositionName]).Y);
+            System.Numerics.Vector2 t1 = new System.Numerics.Vector2(((Vector4)triangle[1][VertexShader.PositionName]).X, ((Vector4)triangle[1][VertexShader.PositionName]).Y);
+            System.Numerics.Vector2 t2 = new System.Numerics.Vector2(((Vector4)triangle[2][VertexShader.PositionName]).X, ((Vector4)triangle[2][VertexShader.PositionName]).Y);
 
             System.Numerics.Vector2 v0 = t1 - t0;
             System.Numerics.Vector2 v1 = t2 - t0;
@@ -290,50 +324,65 @@ namespace ShaderSimulator
             return new Vector3(u, v, w);
         }
 
-        private void CalculateFragmentStep()
+        private Bitmap CalculateFragmentStep()
         {
             Bitmap bmp = new Bitmap(_fragments.GetLength(0), _fragments.GetLength(1));
             for (int x = 0; x < _fragments.GetLength(0); x++)
             {
                 for (int y = 0; y < _fragments.GetLength(1); y++)
                 {
+                    bmp.SetPixel(x, y, Color.Black);
                     if (_fragments[x, y] != null)
                     {
                         for (int i = 0; i < _fragments[x, y].Values.First().Count; i++)
                         {
-                            foreach (var key in _fragments[x, y].Keys)
+
+                            bool closest = true;
+                            if (DepthEnabled)
                             {
-                                SetAttribute(_activeFragmentShader, key, _fragments[x, y][key][i]);
-                            }
-                            _activeFragmentShader.Main();
-                            foreach (var outValue in _activeFragmentShader.GetOutValues())
-                            {
-                                if (outValue.Key == "Color")
+                                if (_depths[x, y][i] < 0)
                                 {
-                                    Color color = Color.FromArgb((int)(((Vector4)outValue.Value).A * 255),
-                                        (int)(((Vector4)outValue.Value).R * 255),
-                                        (int)(((Vector4)outValue.Value).G * 255),
-                                        (int)(((Vector4)outValue.Value).B * 255));
-                                    bmp.SetPixel(x, y, color);
+                                    closest = false;
+                                    continue;
+                                }
+
+                                for (int j = 0; j < _depths[x, y].Count; j++)
+                                {
+                                    if (i != j && _depths[x, y][j] >= 0)
+                                    {
+                                        if (_depths[x, y][i] > _depths[x, y][j])
+                                        {
+                                            closest = false;
+                                        }
+                                    }
+                                }
+                            }
+                            if (closest)
+                            {
+                                foreach (var key in _fragments[x, y].Keys)
+                                {
+                                    SetAttribute(_activeFragmentShader, key, _fragments[x, y][key][i]);
+                                }
+                                _activeFragmentShader.Main();
+                                foreach (var outValue in _activeFragmentShader.GetOutValues())
+                                {
+                                    if (outValue.Key == FragmentShader.ColorName)
+                                    {
+                                        Color color = Color.FromArgb((int)(((Vector4)outValue.Value).A * 255),
+                                            (int)(((Vector4)outValue.Value).R * 255),
+                                            (int)(((Vector4)outValue.Value).G * 255),
+                                            (int)(((Vector4)outValue.Value).B * 255));
+
+                                        bmp.SetPixel(x, y, color);
+                                    }
                                 }
                             }
                         }
                     }
-                    else
-                    {
-                        bmp.SetPixel(x, y, Color.Black);
-                    }
                 }
             }
-            Form form = new Form();
-            form.Text = "Image Viewer";
-            PictureBox pictureBox = new PictureBox();
-            pictureBox.Image = bmp;
-            form.Width = bmp.Width;
-            form.Height = bmp.Height;
-            pictureBox.Dock = DockStyle.Fill;
-            form.Controls.Add(pictureBox);
-            Application.Run(form);
+
+            return bmp;
         }
     }
 }
