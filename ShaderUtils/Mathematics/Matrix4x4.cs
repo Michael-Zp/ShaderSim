@@ -234,12 +234,27 @@ namespace ShaderSim.Mathematics
             return output;
         }
 
+        public static Vector4 operator *(Matrix4x4 a, Vector4 b)
+        {
+            Vector4 output = new Vector4(0, 0, 0, 0);
+
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    output[i] += b[i] * a[j, i];
+                }
+            }
+
+            return output;
+        }
+
         public static implicit operator System.Numerics.Matrix4x4(Matrix4x4 mat)
         {
             return new System.Numerics.Matrix4x4(mat.M00, mat.M01, mat.M02, mat.M03, mat.M10, mat.M11, mat.M12, mat.M13, mat.M20, mat.M21, mat.M22, mat.M23, mat.M30, mat.M31, mat.M32, mat.M33);
         }
 
-        public static explicit operator Matrix4x4(System.Numerics.Matrix4x4 mat)
+        public static implicit operator Matrix4x4(System.Numerics.Matrix4x4 mat)
         {
             return new Matrix4x4(mat.M11, mat.M12, mat.M13, mat.M14, mat.M21, mat.M22, mat.M23, mat.M24, mat.M31, mat.M32, mat.M33, mat.M34, mat.M41, mat.M42, mat.M43, mat.M44);
         }

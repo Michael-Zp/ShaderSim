@@ -2,7 +2,7 @@
 
 namespace ShaderSim.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Struct)]
     public class TranslationAttribute : Attribute
     {
         public string Term { get; }

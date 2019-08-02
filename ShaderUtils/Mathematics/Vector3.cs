@@ -639,12 +639,22 @@ namespace ShaderSim.Mathematics
             };
         }
 
+        public static Vector3 operator -(Vector3 a)
+        {
+            return new Vector3()
+            {
+                X = -a.X,
+                Y = -a.Y,
+                Z = -a.Z,
+            };
+        }
+
         public static implicit operator System.Numerics.Vector3(Vector3 vec)
         {
             return new System.Numerics.Vector3(vec.X, vec.Y, vec.Z);
         }
 
-        public static explicit operator Vector3(System.Numerics.Vector3 vec)
+        public static implicit operator Vector3(System.Numerics.Vector3 vec)
         {
             return new Vector3(vec.X, vec.Y, vec.Z);
         }

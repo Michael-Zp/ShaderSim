@@ -2215,12 +2215,23 @@ namespace ShaderSim.Mathematics
             };
         }
 
+        public static Vector4 operator -(Vector4 a)
+        {
+            return new Vector4()
+            {
+                X = -a.X,
+                Y = -a.Y,
+                Z = -a.Z,
+                W = -a.W,
+            };
+        }
+
         public static implicit operator System.Numerics.Vector4(Vector4 vec)
         {
             return new System.Numerics.Vector4(vec.X, vec.Y, vec.Z, vec.W);
         }
 
-        public static explicit operator Vector4(System.Numerics.Vector4 vec)
+        public static implicit operator Vector4(System.Numerics.Vector4 vec)
         {
             return new Vector4(vec.X, vec.Y, vec.Z, vec.W);
         }
