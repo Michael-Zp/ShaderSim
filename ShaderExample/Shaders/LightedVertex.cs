@@ -2,7 +2,7 @@
 using ShaderSim.Attributes;
 using ShaderSim.Mathematics;
 
-namespace ShaderExample
+namespace ShaderExample.Shaders
 {
     class LightedVertex : VertexShader
     {
@@ -10,7 +10,7 @@ namespace ShaderExample
         public Matrix4x4 Camera { private get; set; }
 
         [In]
-        public Vector4 InstanceTransformation { private get; set; }
+        public Matrix4x4 InstanceTransformation { private get; set; }
 
         [In]
         public Vector3 Pos { private get; set; }
@@ -34,6 +34,7 @@ namespace ShaderExample
         {
             WorldPos = (InstanceTransformation * new Vector4(Pos, 1)).XYZ;
             N = (InstanceTransformation * new Vector4(Normal, 0)).XYZ;
+            Matrix4x4 test = Camera * InstanceTransformation;
             Position = Camera * InstanceTransformation * new Vector4(Pos, 1);
             Col = Color;
         }

@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using ShaderRenderer;
 using ShaderSim;
 using ShaderSim.Attributes;
 using ShaderSim.Mathematics;
@@ -33,12 +33,11 @@ namespace ShaderSimulator
         private List<float>[,] _depths;
         private Dictionary<string, IList>[,] _fragments;
 
-        private Renderer _renderer;
+        private int _width;
+        private int _height;
 
         public RenderSimulator()
         {
-            _renderer = new Renderer();
-
             _renderData = new Dictionary<IVertexArrayObject, IList<uint>>();
             _uniforms = new Dictionary<string, object>();
             _attributes = new Dictionary<Shader, Dictionary<string, IList>>();
@@ -49,6 +48,12 @@ namespace ShaderSimulator
             _vertexPositions = new List<Vector4>();
             _vertexValues = new Dictionary<string, IList>();
             _primitives = new List<Triangle>();
+        }
+
+        public void SetRenderSize(int width, int height)
+        {
+            _width = width;
+            _height = height;
         }
 
         public void SetRenderData(IVertexArrayObject vao, IEnumerable<uint> data)
@@ -139,7 +144,7 @@ namespace ShaderSimulator
             _activeVAO = null;
         }
 
-        public void DrawElementsInstanced(int instanceCount = 1)
+        public Bitmap DrawElementsInstanced(int instanceCount = 1)
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Reset();
@@ -154,15 +159,16 @@ namespace ShaderSimulator
             stopwatch.Stop();
             Console.WriteLine($"Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.Milliseconds}");
 
-            Form form = new Form();
-            form.Text = "Image Viewer";
-            PictureBox pictureBox = new PictureBox();
-            pictureBox.Image = result;
-            form.Width = result.Width;
-            form.Height = result.Height;
-            pictureBox.Dock = DockStyle.Fill;
-            form.Controls.Add(pictureBox);
-            Application.Run(form);
+            _attributes.Clear();
+            _instancedAttributes.Clear();
+            _renderData.Clear();
+            _vertexPositions.Clear();
+            _vertexValues.Clear();
+            _primitives.Clear();
+
+            result.Save("test.png", ImageFormat.Png);
+
+            return result;
         }
 
         private void SetUniforms()
@@ -243,14 +249,14 @@ namespace ShaderSimulator
 
         private void CalculateFragments()
         {
-            Vector2[,] positions = new Vector2[_renderer.Width, _renderer.Height];
+            Vector2[,] positions = new Vector2[_width, _height];
 
-            _depths = new List<float>[_renderer.Width, _renderer.Height];
-            _fragments = new Dictionary<string, IList>[_renderer.Width, _renderer.Height];
+            _depths = new List<float>[_width, _height];
+            _fragments = new Dictionary<string, IList>[_width, _height];
 
-            for (int x = 0; x < _renderer.Width; x++)
+            for (int x = 0; x < _width; x++)
             {
-                for (int y = 0; y < _renderer.Height; y++)
+                for (int y = 0; y < _height; y++)
                 {
                     positions[x, y] = CalculatePosition(x, y);
                     foreach (var primitive in _primitives)
@@ -295,7 +301,7 @@ namespace ShaderSimulator
 
         private Vector2 CalculatePosition(int x, int y)
         {
-            Vector2 fragSize = new Vector2(2f / _renderer.Width, 2f / _renderer.Height);
+            Vector2 fragSize = new Vector2(2f / _width, 2f / _height);
 
             return new Vector2(fragSize.X * x + fragSize.X / 2 - 1, -(fragSize.Y * y + fragSize.Y / 2 - 1));
         }
@@ -331,7 +337,7 @@ namespace ShaderSimulator
             {
                 for (int y = 0; y < _fragments.GetLength(1); y++)
                 {
-                    bmp.SetPixel(x, y, Color.Black);
+                    bmp.SetPixel(x, y, Color.Transparent);
                     if (_fragments[x, y] != null)
                     {
                         for (int i = 0; i < _fragments[x, y].Values.First().Count; i++)

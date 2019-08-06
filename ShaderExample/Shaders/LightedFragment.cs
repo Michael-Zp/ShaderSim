@@ -2,7 +2,7 @@
 using ShaderSim.Attributes;
 using ShaderSim.Mathematics;
 
-namespace ShaderExample
+namespace ShaderExample.Shaders
 {
     class LightedFragment : FragmentShader
     {

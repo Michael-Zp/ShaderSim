@@ -211,23 +211,8 @@ namespace ShaderSim.Mathematics
                 {
                     for (int k = 0; k < 4; k++)
                     {
-                        output[k, i] += a[i, j] * b[j, k];
+                        output[i, j] += b[i, k] * a[k, j];
                     }
-                }
-            }
-
-            return output;
-        }
-
-        public static Vector4 operator *(Vector4 a, Matrix4x4 b)
-        {
-            Vector4 output = new Vector4(0, 0, 0, 0);
-
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    output[i] += a[i] * b[i, j];
                 }
             }
 
@@ -242,7 +227,7 @@ namespace ShaderSim.Mathematics
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    output[i] += b[i] * a[j, i];
+                    output[j] += b[i] * a[i, j];
                 }
             }
 

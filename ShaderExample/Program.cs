@@ -1,8 +1,11 @@
-using System;
-using System.Diagnostics;
+using System.Collections.Generic;
+using OpenTK;
+using ShaderExample.Shaders;
+using ShaderExample.Utils;
 using ShaderSim;
-using ShaderSim.Mathematics;
 using ShaderSimulator;
+using Vector3 = ShaderSim.Mathematics.Vector3;
+using Vector4 = ShaderSim.Mathematics.Vector4;
 
 namespace ShaderExample
 {
@@ -10,25 +13,16 @@ namespace ShaderExample
     {
         static void Main(string[] args)
         {
-            DefaultMesh triangle = new DefaultMesh();
-            triangle.Pos.Add(new Vector3(0f, 0f, 1f));
-            triangle.Pos.Add(new Vector3(0.2f, 0.2f, 1f));
-            triangle.Pos.Add(new Vector3(0f, 0.2f, 1f));
-            triangle.IDs.Add(0);
-            triangle.IDs.Add(1);
-            triangle.IDs.Add(2);
+            GameWindow window = new GameWindow();
+            Model model = new Model();
+            View view = new View();
 
+            window.UpdateFrame += (s, e) => model.Update((float)e.Time);
+            window.RenderFrame += (s, e) => view.Render(model.Entities);
+            window.RenderFrame += (s, e) => window.SwapBuffers();
+            window.Resize += (s, e) => view.Resize(window.Width, window.Height);
 
-            RenderSimulator simulator = new RenderSimulator();
-            simulator.DepthEnabled = true;
-            PassVertex vertexShader = new PassVertex();
-            SimulatorVAO vao = VAOLoader.FromMesh<SimulatorVAO>(triangle, vertexShader, new object[] { simulator });
-            vao.SetAttribute("InstancePosition", vertexShader, new Vector3[] { new Vector3(0f, -0.5f, -.5f), new Vector3(0f, -0.4f, 0f), new Vector3(0.5f, 0.5f, 0f), new Vector3(-0.5f, 0.5f, 0f) }, true);
-            vao.SetAttribute("Color", vertexShader, new Vector4[] { new Vector4(1f, 0f, 0f, 1f), new Vector4(1f, 1f, 0f, 1f), new Vector4(0f, 0f, 1f, 1f), new Vector4(0f, 1f, 0f, 1f) }, true);
-            simulator.ActivateShader(vertexShader, new PassFragment());
-            simulator.ActivateVAO(vao);
-
-            simulator.DrawElementsInstanced(4);
+            window.Run();
         }
     }
 }
