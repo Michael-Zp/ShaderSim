@@ -166,8 +166,6 @@ namespace ShaderSimulator
             _vertexValues.Clear();
             _primitives.Clear();
 
-            result.Save("test.png", ImageFormat.Png);
-
             return result;
         }
 
