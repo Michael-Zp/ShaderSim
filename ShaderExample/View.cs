@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Numerics;
-using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using ShaderExample.Graphics;
 using ShaderExample.Shaders;
@@ -20,6 +17,8 @@ namespace ShaderExample
         private VertexShader _vertex;
         private FragmentShader _fragment;
 
+        CameraPerspective _camera = new CameraPerspective();
+
         public View()
         {
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
@@ -34,7 +33,9 @@ namespace ShaderExample
             List<Bitmap> layers = new List<Bitmap>();
 
             Dictionary<SimulatorVAO, int> simulatorVAOs = PrepareSimVAOs(entities);
-            _simulator.SetUniform("Camera", (Matrix4x4)System.Numerics.Matrix4x4.CreateTranslation(new System.Numerics.Vector3(0.2f, 0, 0)));
+            _camera.Position = new System.Numerics.Vector3(0f, 0f, 10f);
+            _simulator.SetUniform("Camera", (Matrix4x4)_camera.CalcMatrix());
+            //_simulator.SetUniform("Camera", (Matrix4x4)System.Numerics.Matrix4x4.Transpose(System.Numerics.Matrix4x4.CreateTranslation(new System.Numerics.Vector3(0f, 0.5f, 0))));
             _simulator.ActivateShader(_vertex, _fragment);
             foreach (var simulatorVaO in simulatorVAOs)
             {
@@ -113,6 +114,7 @@ namespace ShaderExample
         {
             GL.Viewport(0, 0, width, height);
             _simulator.SetRenderSize(width, height);
+            _camera.Aspect = (float)width / height;
         }
     }
 }

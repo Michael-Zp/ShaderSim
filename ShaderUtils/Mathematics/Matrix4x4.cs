@@ -26,8 +26,8 @@ namespace ShaderSim.Mathematics
         }
         public float M03
         {
-            get => Column1[3];
-            set => Column1[3] = value;
+            get => Column0[3];
+            set => Column0[3] = value;
         }
         public float M10
         {
@@ -211,7 +211,7 @@ namespace ShaderSim.Mathematics
                 {
                     for (int k = 0; k < 4; k++)
                     {
-                        output[i, j] += b[i, k] * a[k, j];
+                        output[i, j] += a[i, k] * b[k, j];
                     }
                 }
             }
@@ -227,7 +227,7 @@ namespace ShaderSim.Mathematics
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    output[j] += b[i] * a[i, j];
+                    output[j] += b[i] * a[j, i];
                 }
             }
 
@@ -241,7 +241,8 @@ namespace ShaderSim.Mathematics
 
         public static implicit operator Matrix4x4(System.Numerics.Matrix4x4 mat)
         {
-            return new Matrix4x4(mat.M11, mat.M12, mat.M13, mat.M14, mat.M21, mat.M22, mat.M23, mat.M24, mat.M31, mat.M32, mat.M33, mat.M34, mat.M41, mat.M42, mat.M43, mat.M44);
+            Matrix4x4 result = new Matrix4x4(mat.M11, mat.M12, mat.M13, mat.M14, mat.M21, mat.M22, mat.M23, mat.M24, mat.M31, mat.M32, mat.M33, mat.M34, mat.M41, mat.M42, mat.M43, mat.M44);
+            return result;
         }
     }
 }

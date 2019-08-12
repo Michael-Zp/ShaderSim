@@ -344,15 +344,15 @@ namespace ShaderSimulator
                             bool closest = true;
                             if (DepthEnabled)
                             {
-                                if (_depths[x, y][i] < 0)
+                                /*if (_depths[x, y][i] < 0)
                                 {
                                     closest = false;
                                     continue;
-                                }
+                                }*/
 
                                 for (int j = 0; j < _depths[x, y].Count; j++)
                                 {
-                                    if (i != j && _depths[x, y][j] >= 0)
+                                    if (i != j /*&& _depths[x, y][j] >= 0*/)
                                     {
                                         if (_depths[x, y][i] > _depths[x, y][j])
                                         {

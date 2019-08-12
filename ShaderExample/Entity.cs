@@ -10,9 +10,9 @@ namespace ShaderExample
 
         public Matrix4x4 AdditionalTransformation { private get; set; } = Matrix4x4.Identity;
 
-        public Matrix4x4 Transformation => Matrix4x4.CreateScale(_scale * ScaleFactor) *
+        public Matrix4x4 Transformation => Matrix4x4.Transpose(Matrix4x4.CreateScale(_scale * ScaleFactor) *
                                            MatrixHelper.CreateRotation(_rotation) *
-                                           Matrix4x4.CreateTranslation(_position) * AdditionalTransformation;
+                                           Matrix4x4.CreateTranslation(_position) * AdditionalTransformation);
 
         private Vector3 _position;
         private Vector3 _rotation;

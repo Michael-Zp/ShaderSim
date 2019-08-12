@@ -14,7 +14,8 @@ namespace ShaderExample
         {
             _entities = new List<Entity>();
 
-            _entities.Add(new Entity(Enums.EntityType.Triangle, new Vector4(1, 0, 0, 1), Vector3.Zero, Vector3.Zero, Vector3.One));
+            _entities.Add(new Entity(Enums.EntityType.Triangle, new Vector4(1f, 0, 0, 1), new Vector3(0.5f, 0, 0), Vector3.Zero, Vector3.One));
+            _entities.Add(new Entity(Enums.EntityType.Triangle, new Vector4(1f, 1, 0, 1), new Vector3(-0.5f, 0, -2), Vector3.Zero, Vector3.One));
         }
 
         public void Update(float deltaTime)

@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CameraPerspective.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Graphics\Drawer.cs" />
     <Compile Include="Graphics\ShaderProgram.cs" />
