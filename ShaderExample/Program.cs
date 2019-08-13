@@ -1,4 +1,8 @@
+using System;
 using OpenTK;
+using ShaderExample.Shaders;
+using ShaderTranslator;
+using ShaderUtils;
 
 namespace ShaderExample
 {
@@ -6,16 +10,22 @@ namespace ShaderExample
     {
         static void Main(string[] args)
         {
-            GameWindow window = new GameWindow();
-            Model model = new Model();
-            View view = new View();
+            RenderTranslator translator = new RenderTranslator();
+            Shader shader = new LightedVertex();
 
-            window.UpdateFrame += (s, e) => model.Update((float)e.Time);
-            window.RenderFrame += (s, e) => view.Render(model.Entities);
-            window.RenderFrame += (s, e) => window.SwapBuffers();
-            window.Resize += (s, e) => view.Resize(window.Width, window.Height);
+            translator.RegisterShader(shader, @"C:\Users\Matze\Documents\Git\Master-Thesis\ShaderSim\ShaderExample\Shaders\LightedVertex.cs");
+            Console.Read();
 
-            window.Run();
+            //GameWindow window = new GameWindow();
+            //Model model = new Model();
+            //View view = new View();
+
+            //window.UpdateFrame += (s, e) => model.Update((float)e.Time);
+            //window.RenderFrame += (s, e) => view.Render(model.Entities);
+            //window.RenderFrame += (s, e) => window.SwapBuffers();
+            //window.Resize += (s, e) => view.Resize(window.Width, window.Height);
+
+            //window.Run();
         }
     }
 }
