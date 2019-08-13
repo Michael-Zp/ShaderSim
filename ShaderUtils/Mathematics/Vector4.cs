@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ShaderSim.Mathematics
+namespace ShaderUtils.Mathematics
 {
     public struct Vector4
     {

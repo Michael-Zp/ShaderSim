@@ -4,14 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{30E56217-63BD-45EE-8165-11CD9B019A12}</ProjectGuid>
+    <ProjectGuid>{6432AC97-3E3A-40D2-8328-3DFCC90038BF}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>ShaderExample</RootNamespace>
     <AssemblyName>ShaderExample</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -52,17 +52,17 @@
     <Compile Include="Entity.cs" />
     <Compile Include="Graphics\Drawer.cs" />
     <Compile Include="Graphics\ShaderProgram.cs" />
-    <Compile Include="Utils\MeshCreator.cs" />
-    <Compile Include="Utils\Enums.cs" />
-    <Compile Include="Utils\MatrixHelper.cs" />
+    <Compile Include="Graphics\Texture2d.cs" />
     <Compile Include="Model.cs" />
-    <Compile Include="Shaders\LightedFragment.cs" />
-    <Compile Include="Shaders\PassFragment.cs" />
-    <Compile Include="Shaders\LightedVertex.cs" />
-    <Compile Include="Shaders\PassVertex.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="Shaders\LightedFragment.cs" />
+    <Compile Include="Shaders\LightedVertex.cs" />
+    <Compile Include="Shaders\PassFragment.cs" />
+    <Compile Include="Shaders\PassVertex.cs" />
+    <Compile Include="Utils\Enums.cs" />
+    <Compile Include="Utils\MatrixHelper.cs" />
+    <Compile Include="Utils\MeshCreator.cs" />
     <Compile Include="View.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -72,14 +72,17 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ShaderSimulator\ShaderSimulator.csproj">
-      <Project>{defd3051-7c0d-4401-b26e-28392f6500e6}</Project>
+      <Project>{21663e37-0645-4761-87c5-d8d9572d7e8d}</Project>
       <Name>ShaderSimulator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ShaderTranslator\ShaderTranslator.csproj">
+      <Project>{f4921bba-cbe6-4819-ab4b-f3353ad063b5}</Project>
+      <Name>ShaderTranslator</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ShaderUtils\ShaderUtils.csproj">
-      <Project>{2927b365-e622-487f-b0d5-c5a59b688209}</Project>
+      <Project>{316d3ef3-7986-4c7b-8705-4ce14c743607}</Project>
       <Name>ShaderUtils</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

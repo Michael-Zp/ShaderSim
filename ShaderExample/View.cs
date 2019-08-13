@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
 using OpenTK.Graphics.OpenGL;
 using ShaderExample.Graphics;
 using ShaderExample.Shaders;
 using ShaderExample.Utils;
-using ShaderSim;
+using ShaderUtils;
 using ShaderSimulator;
-using Matrix4x4 = ShaderSim.Mathematics.Matrix4x4;
-using Vector4 = ShaderSim.Mathematics.Vector4;
+using Matrix4x4 = ShaderUtils.Mathematics.Matrix4x4;
+using Vector4 = ShaderUtils.Mathematics.Vector4;
 
 namespace ShaderExample
 {
     class View
     {
-        private readonly RenderSimulator _simulator = new RenderSimulator();
+        private readonly RenderWrapper _wrapper = new RenderSimulator();
         private VertexShader _vertex;
         private FragmentShader _fragment;
 
@@ -30,32 +29,28 @@ namespace ShaderExample
             _vertex = new LightedVertex();
             _fragment = new PassFragment();
 
-            List<Bitmap> layers = new List<Bitmap>();
-
-            Dictionary<SimulatorVAO, int> simulatorVAOs = PrepareSimVAOs(entities);
+            Dictionary<VertexArrayObject, int> simulatorVAOs = PrepareVAOs(entities);
             _camera.Position = new System.Numerics.Vector3(0f, 0f, 10f);
-            _simulator.SetUniform("Camera", (Matrix4x4)_camera.CalcMatrix());
-            //_simulator.SetUniform("Camera", (Matrix4x4)System.Numerics.Matrix4x4.Transpose(System.Numerics.Matrix4x4.CreateTranslation(new System.Numerics.Vector3(0f, 0.5f, 0))));
-            _simulator.ActivateShader(_vertex, _fragment);
+            _wrapper.SetUniform("Camera", (Matrix4x4)_camera.CalcMatrix());
+            //_wrapper.SetUniform("Camera", (Matrix4x4)System.Numerics.Matrix4x4.Transpose(System.Numerics.Matrix4x4.CreateTranslation(new System.Numerics.Vector3(0f, 0.5f, 0))));
+            _wrapper.ActivateShader(_vertex, _fragment);
+
+            List<Texture2D> layers = new List<Texture2D>();
+
             foreach (var simulatorVaO in simulatorVAOs)
             {
-                _simulator.ActivateVAO(simulatorVaO.Key);
+                _wrapper.ActivateVAO(simulatorVaO.Key);
 
-                layers.Add(_simulator.DrawElementsInstanced(simulatorVaO.Value));
+                _wrapper.DrawElementsInstanced(simulatorVaO.Value);
+                layers.Add(new Texture2D(((RenderSimulator)_wrapper).RenderResult));
 
-                _simulator.DeactivateVAO();
+                _wrapper.DeactivateVAO();
             }
-            _simulator.DeactivateShader();
-
-            List<Texture2D> images = new List<Texture2D>();
-            foreach (var bitmap in layers)
-            {
-                images.Add(new Texture2D(bitmap));
-            }
+            _wrapper.DeactivateShader();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Enable(EnableCap.Texture2D);
-            images[0].Bind();
+            layers[0].Bind();
 
             Drawer.DrawScreenQuad();
 
@@ -63,11 +58,11 @@ namespace ShaderExample
             GL.Disable(EnableCap.Texture2D);
         }
 
-        private Dictionary<SimulatorVAO, int> PrepareSimVAOs(IEnumerable<Entity> entities)
+        private Dictionary<VertexArrayObject, int> PrepareVAOs(IEnumerable<Entity> entities)
         {
-            Dictionary<SimulatorVAO, int> simulatorVAOs = new Dictionary<SimulatorVAO, int>();
+            Dictionary<VertexArrayObject, int> simulatorVAOs = new Dictionary<VertexArrayObject, int>();
 
-            Dictionary<Enums.EntityType, SimulatorVAO> simVAOs = new Dictionary<Enums.EntityType, SimulatorVAO>();
+            Dictionary<Enums.EntityType, VertexArrayObject> simVAOs = new Dictionary<Enums.EntityType, VertexArrayObject>();
             Dictionary<Enums.EntityType, List<Matrix4x4>> transformations = new Dictionary<Enums.EntityType, List<Matrix4x4>>();
             Dictionary<Enums.EntityType, List<Vector4>> colors = new Dictionary<Enums.EntityType, List<Vector4>>();
             Dictionary<Enums.EntityType, int> instanceCounts = new Dictionary<Enums.EntityType, int>();
@@ -86,7 +81,7 @@ namespace ShaderExample
 
                     if (mesh != null)
                     {
-                        simVAOs.Add(entity.Type, VAOLoader.FromMesh<SimulatorVAO>(mesh, _vertex, new object[] { _simulator }));
+                        simVAOs.Add(entity.Type, VAOLoader.FromMesh(mesh, _vertex, _wrapper));
                         transformations.Add(entity.Type, new List<Matrix4x4>());
                         colors.Add(entity.Type, new List<Vector4>());
                         instanceCounts.Add(entity.Type, 0);
@@ -113,7 +108,7 @@ namespace ShaderExample
         public void Resize(int width, int height)
         {
             GL.Viewport(0, 0, width, height);
-            _simulator.SetRenderSize(width, height);
+            _wrapper.SetRenderSize(width, height);
             _camera.Aspect = (float)width / height;
         }
     }

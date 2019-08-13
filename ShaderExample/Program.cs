@@ -1,11 +1,4 @@
-using System.Collections.Generic;
 using OpenTK;
-using ShaderExample.Shaders;
-using ShaderExample.Utils;
-using ShaderSim;
-using ShaderSimulator;
-using Vector3 = ShaderSim.Mathematics.Vector3;
-using Vector4 = ShaderSim.Mathematics.Vector4;
 
 namespace ShaderExample
 {

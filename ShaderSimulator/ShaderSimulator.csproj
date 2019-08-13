@@ -4,14 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DEFD3051-7C0D-4401-B26E-28392F6500E6}</ProjectGuid>
+    <ProjectGuid>{21663E37-0645-4761-87C5-D8D9572D7E8D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>ShaderSimulator</RootNamespace>
     <AssemblyName>ShaderSimulator</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -40,7 +40,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,19 +50,14 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenderSimulator.cs" />
-    <Compile Include="SimulatorVAO.cs" />
     <Compile Include="Triangle.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ShaderRenderer\ShaderRenderer.csproj">
-      <Project>{c2cbd03b-735e-4e2a-844e-ee5ccbca2efe}</Project>
-      <Name>ShaderRenderer</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ShaderUtils\ShaderUtils.csproj">
-      <Project>{2927b365-e622-487f-b0d5-c5a59b688209}</Project>
+      <Project>{316d3ef3-7986-4c7b-8705-4ce14c743607}</Project>
       <Name>ShaderUtils</Name>
     </ProjectReference>
   </ItemGroup>

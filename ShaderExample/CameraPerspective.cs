@@ -11,7 +11,7 @@ namespace ShaderExample
         public CameraPerspective()
         {
             Aspect = 1;
-            FarClip = 2;
+            FarClip = 100;
             FovY = 90;
             Jaw = 0;
             NearClip = 0.001f;

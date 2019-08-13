@@ -1,6 +1,6 @@
-﻿using ShaderSim;
-using ShaderSim.Attributes;
-using ShaderSim.Mathematics;
+﻿using ShaderUtils;
+using ShaderUtils.Attributes;
+using ShaderUtils.Mathematics;
 
 namespace ShaderExample.Shaders
 {

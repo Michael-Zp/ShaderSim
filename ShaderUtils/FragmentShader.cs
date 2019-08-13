@@ -1,7 +1,7 @@
-﻿using ShaderSim.Attributes;
-using ShaderSim.Mathematics;
+﻿using ShaderUtils.Attributes;
+using ShaderUtils.Mathematics;
 
-namespace ShaderSim
+namespace ShaderUtils
 {
     public abstract class FragmentShader : Shader
     {

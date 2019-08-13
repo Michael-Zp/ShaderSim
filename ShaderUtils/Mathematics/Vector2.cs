@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Remoting.Messaging;
 
-namespace ShaderSim.Mathematics
+namespace ShaderUtils.Mathematics
 {
     public struct Vector2
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ShaderSim.Attributes
+namespace ShaderUtils.Attributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Struct)]
     public class TranslationAttribute : Attribute

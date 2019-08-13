@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using ShaderSim.Mathematics;
+using ShaderUtils.Mathematics;
 
-namespace ShaderSim
+namespace ShaderUtils
 {
     public class DefaultMesh : Mesh
     {

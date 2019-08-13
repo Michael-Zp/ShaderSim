@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ShaderSim
+namespace ShaderUtils
 {
     public class Mesh
     {

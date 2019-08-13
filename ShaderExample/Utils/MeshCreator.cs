@@ -1,5 +1,5 @@
-﻿using ShaderSim;
-using ShaderSim.Mathematics;
+﻿using ShaderUtils;
+using ShaderUtils.Mathematics;
 
 namespace ShaderExample.Utils
 {
