@@ -9,6 +9,7 @@ namespace ShaderUtils
 {
     public abstract class Shader
     {
+        [Translation("main")]
         public abstract void Main();
 
         public void SetValue<TAttribute, TValue>(string name, TValue value) where TAttribute : Attribute where TValue : struct
@@ -101,16 +102,19 @@ namespace ShaderUtils
             return System.Numerics.Vector3.Reflect(v1, v2);
         }
 
+        [Translation("normalize")]
         protected Vector2 Normalize(Vector2 v)
         {
             return System.Numerics.Vector2.Normalize(v);
         }
 
+        [Translation("normalize")]
         protected Vector3 Normalize(Vector3 v)
         {
             return System.Numerics.Vector3.Normalize(v);
         }
 
+        [Translation("normalize")]
         protected Vector4 Normalize(Vector4 v)
         {
             return System.Numerics.Vector4.Normalize(v);

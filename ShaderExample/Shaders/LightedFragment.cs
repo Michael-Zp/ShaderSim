@@ -40,7 +40,7 @@ namespace ShaderExample.Shaders
 
             Vector4 ambient = AmbientLightColor * Col;
             Vector4 diffuse = Col * LightColor * Lambert(normal, -LightDirection);
-            Vector4 specular = LightColor * Specular(N, LightDirection, Normalize(CameraPosition - WorldPos), 100f);
+            Vector4 specular = LightColor * Specular(normal, LightDirection, Normalize(CameraPosition - WorldPos), 99.9f);
 
             Color = ambient + diffuse + specular;
         }

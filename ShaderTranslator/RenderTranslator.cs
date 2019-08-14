@@ -25,8 +25,8 @@ namespace ShaderTranslator
             string programText = File.ReadAllText(shaderFilePath);
             SyntaxTree tree = CSharpSyntaxTree.ParseText(programText).WithFilePath(shaderFilePath);
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-            ListMembers(((NamespaceDeclarationSyntax)root.Members.First()).Members.First());
-            Translate(root);
+            //ListMembers(((NamespaceDeclarationSyntax)root.Members.First()).Members.First());
+            Console.WriteLine(Translate(root));
         }
 
         public override void DrawElementsInstanced(int instanceCount = 1)
@@ -84,7 +84,7 @@ namespace ShaderTranslator
             }
         }
 
-        private void Translate(CompilationUnitSyntax root)
+        private string Translate(CompilationUnitSyntax root)
         {
             String code = "#version 430 core\n";
             SyntaxNode classNode = FindFirstNode<ClassDeclarationSyntax>(root);
@@ -92,8 +92,7 @@ namespace ShaderTranslator
             {
                 code += TranslateNode(child);
             }
-
-            Console.WriteLine(code);
+            return code;
         }
 
         private T FindFirstNode<T>(SyntaxNode node) where T : SyntaxNode
@@ -106,18 +105,102 @@ namespace ShaderTranslator
             string code = "";
             switch (node)
             {
+                case BaseListSyntax syntax:
+                    if (syntax.Types.Any(b => b.ChildNodes().Any(c =>
+                        c is IdentifierNameSyntax && ((IdentifierNameSyntax)c).Identifier.ValueText == ("FragmentShader"))))
+                    {
+                        code += "out vec4 Color;\n";
+                    }
+                    break;
                 case PropertyDeclarationSyntax syntax:
                     foreach (var child in node.ChildNodes())
                     {
                         code += TranslateNode(child);
                     }
-                    code += $"{syntax.Identifier}\n";
+                    code += $" {syntax.Identifier};\n";
                     break;
                 case MethodDeclarationSyntax syntax:
                     code += TranslateNode(syntax.ReturnType);
-                    code += syntax.Identifier + "(";
-                    code += TranslateNode(syntax.ParameterList) + "){\n";
-                    code += TranslateNode(syntax.Body) + "}";
+                    MethodInfo m = typeof(Shader).GetMethod(syntax.Identifier.ValueText);
+                    if (m == null)
+                    {
+                        m = typeof(VertexShader).GetMethod(syntax.Identifier.ValueText);
+                    }
+                    if (m == null)
+                    {
+                        m = typeof(FragmentShader).GetMethod(syntax.Identifier.ValueText);
+                    }
+                    if (m == null)
+                    {
+                        code += syntax.Identifier;
+                    }
+                    else
+                    {
+                        TranslationAttribute attribute = (TranslationAttribute)m.GetCustomAttributes(typeof(TranslationAttribute), true).FirstOrDefault();
+                        if (attribute != null)
+                        {
+                            code += attribute.Term;
+                        }
+                        else
+                        {
+                            code += syntax.Identifier;
+                        }
+                    }
+
+                    code += "(";
+                    code += TranslateNode(syntax.ParameterList) + ")\n{\n";
+                    code += TranslateNode(syntax.Body) + "}\n";
+                    break;
+                case BlockSyntax syntax:
+                    foreach (var statement in syntax.Statements)
+                    {
+                        code += "\t" + TranslateNode(statement);
+                    }
+                    break;
+                case LocalDeclarationStatementSyntax syntax:
+                    foreach (var child in node.ChildNodes())
+                    {
+                        code += TranslateNode(child);
+                    }
+                    code += ";\n";
+                    break;
+                case ExpressionStatementSyntax syntax:
+                    foreach (var child in node.ChildNodes())
+                    {
+                        code += TranslateNode(child);
+                    }
+                    code += ";\n";
+                    break;
+                case ReturnStatementSyntax syntax:
+                    code += syntax.ReturnKeyword + " " + TranslateNode(syntax.Expression) + ";\n";
+                    break;
+                case AssignmentExpressionSyntax syntax:
+                    code += TranslateNode(syntax.Left) + " " + syntax.OperatorToken + " " + TranslateNode(syntax.Right);
+                    break;
+                case VariableDeclarationSyntax syntax:
+                    code += TranslateNode(syntax.Type) + " " + TranslateNode(syntax.Variables.First());
+                    break;
+                case VariableDeclaratorSyntax syntax:
+                    code += syntax.Identifier + " ";
+                    code += TranslateNode(syntax.Initializer);
+                    break;
+                case ObjectCreationExpressionSyntax syntax:
+                    code += TranslateNode(syntax.Type) + "(" + TranslateNode(syntax.ArgumentList) + ")";
+                    break;
+                case InvocationExpressionSyntax syntax:
+                    code += TranslateNode(syntax.Expression) + "(" + TranslateNode(syntax.ArgumentList) + ")";
+                    break;
+                case ParenthesizedExpressionSyntax syntax:
+                    code += syntax.OpenParenToken + TranslateNode(syntax.Expression) + syntax.CloseParenToken;
+                    break;
+                case BinaryExpressionSyntax syntax:
+                    code += TranslateNode(syntax.Left) + " " + syntax.OperatorToken + " " + TranslateNode(syntax.Right);
+                    break;
+                case MemberAccessExpressionSyntax syntax:
+                    code += TranslateNode(syntax.Expression) + syntax.OperatorToken + TranslateNode(syntax.Name);
+                    break;
+                case EqualsValueClauseSyntax syntax:
+                    code += syntax.EqualsToken + " " + TranslateNode(syntax.Value);
                     break;
                 case AttributeSyntax syntax:
                     switch (((IdentifierNameSyntax)syntax.ChildNodes().First()).Identifier.ValueText)
@@ -134,30 +217,97 @@ namespace ShaderTranslator
                     }
                     break;
                 case IdentifierNameSyntax syntax:
-                    if (syntax.Parent is PropertyDeclarationSyntax)
+                    Assembly a = Assembly.GetAssembly(typeof(ShaderUtils.Shader));
+
+                    if (syntax.Parent is PropertyDeclarationSyntax || syntax.Parent is ObjectCreationExpressionSyntax ||
+                        syntax.Parent is VariableDeclarationSyntax || syntax.Parent is ParameterSyntax)
                     {
-                        Assembly a = Assembly.GetAssembly(typeof(ShaderUtils.Shader));
                         Type t = a.GetType("ShaderUtils.Mathematics." + syntax.Identifier);
                         if (t != null)
                         {
-                            TranslationAttribute translation = t.GetCustomAttributes(typeof(TranslationAttribute), true).FirstOrDefault() as TranslationAttribute;
-                            code += translation.Term + " ";
+                            TranslationAttribute translation =
+                                t.GetCustomAttributes(typeof(TranslationAttribute), true).FirstOrDefault() as
+                                    TranslationAttribute;
+                            code += translation.Term;
                         }
                         else
                         {
-                            code += syntax.Identifier + " ";
+                            code += syntax.Identifier;
+                        }
+                    }
+                    else if (syntax.Parent is MemberAccessExpressionSyntax)
+                    {
+                        code += syntax.Identifier.ValueText.ToLower();
+                    }
+                    else if (syntax.Parent is InvocationExpressionSyntax)
+                    {
+                        MethodInfo method = (from info in typeof(Shader).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic) where (info.Name == syntax.Identifier.ValueText) select info).FirstOrDefault();
+                        if (method == null)
+                        {
+                            code += syntax.Identifier;
+                        }
+                        else
+                        {
+                            TranslationAttribute attribute = (TranslationAttribute)method.GetCustomAttributes(typeof(TranslationAttribute), true).FirstOrDefault();
+                            if (attribute != null)
+                            {
+                                code += attribute.Term;
+                            }
+                            else
+                            {
+                                code += syntax.Identifier;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        PropertyInfo p = typeof(Shader).GetProperty(syntax.Identifier.ValueText);
+                        if (p == null)
+                        {
+                            p = typeof(VertexShader).GetProperty(syntax.Identifier.ValueText);
+                        }
+                        if (p == null)
+                        {
+                            p = typeof(FragmentShader).GetProperty(syntax.Identifier.ValueText);
+                        }
+                        if (p == null)
+                        {
+                            code += syntax.Identifier;
+                        }
+                        else
+                        {
+                            TranslationAttribute attribute = (TranslationAttribute)p.GetCustomAttributes(typeof(TranslationAttribute), true).FirstOrDefault();
+                            if (attribute != null)
+                            {
+                                code += attribute.Term;
+                            }
+                            else
+                            {
+                                code += syntax.Identifier;
+                            }
                         }
                     }
                     break;
-
+                case LiteralExpressionSyntax syntax:
+                    code += syntax.Token.ValueText;
+                    break;
                 case PredefinedTypeSyntax syntax:
                     code += syntax.Keyword.ValueText + " ";
                     break;
                 case ParameterListSyntax syntax:
                     for (int i = 0; i < syntax.Parameters.Count; i++)
                     {
+                        code += TranslateNode(syntax.Parameters[i].Type);
+                        code += " ";
                         code += syntax.Parameters[i].Identifier;
-                        code += i + 1 == syntax.Parameters.Count ? "" : ",";
+                        code += i + 1 == syntax.Parameters.Count ? "" : ", ";
+                    }
+                    break;
+                case ArgumentListSyntax syntax:
+                    for (int i = 0; i < syntax.Arguments.Count; i++)
+                    {
+                        code += TranslateNode(syntax.Arguments[i].Expression);
+                        code += i + 1 == syntax.Arguments.Count ? "" : ", ";
                     }
                     break;
                 default:
@@ -165,7 +315,6 @@ namespace ShaderTranslator
                     {
                         code += TranslateNode(child);
                     }
-
                     break;
             }
             return code;

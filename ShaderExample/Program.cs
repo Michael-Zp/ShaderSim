@@ -13,7 +13,7 @@ namespace ShaderExample
             RenderTranslator translator = new RenderTranslator();
             Shader shader = new LightedVertex();
 
-            translator.RegisterShader(shader, @"C:\Users\Matze\Documents\Git\Master-Thesis\ShaderSim\ShaderExample\Shaders\LightedVertex.cs");
+            translator.RegisterShader(shader, @"C:\Users\Matze\Documents\Git\Master-Thesis\ShaderSim\ShaderExample\Shaders\LightedFragment.cs");
             Console.Read();
 
             //GameWindow window = new GameWindow();
