@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Runtime.Remoting.Messaging;
+using ShaderUtils.Attributes;
 
 namespace ShaderUtils.Mathematics
 {
+    [Translation("vec2")]
     public struct Vector2
     {
         public float X { get; set; }

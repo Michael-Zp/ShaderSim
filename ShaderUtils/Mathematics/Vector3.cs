@@ -1,7 +1,9 @@
 ﻿using System;
+using ShaderUtils.Attributes;
 
 namespace ShaderUtils.Mathematics
 {
+    [Translation("vec3")]
     public struct Vector3
     {
         public float X { get; set; }

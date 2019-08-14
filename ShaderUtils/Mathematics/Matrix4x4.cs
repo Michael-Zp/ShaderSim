@@ -1,7 +1,9 @@
 ﻿using System;
+using ShaderUtils.Attributes;
 
 namespace ShaderUtils.Mathematics
 {
+    [Translation("mat4")]
     public struct Matrix4x4
     {
         public Vector4 Column0;
