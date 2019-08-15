@@ -1,0 +1,5 @@
+PWD H:/Studium/Tex/LaTeX-Vorlage
+INPUT h:/texlive/2018/texmf.cnf
+INPUT h:/texlive/2018/texmf-dist/web2c/texmf.cnf
+INPUT h:/texlive/2018/texmf-var/web2c/pdftex/pdflatex.fmt
+OUTPUT output/texput.log
