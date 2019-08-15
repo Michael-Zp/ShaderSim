@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using OpenTK;
 using ShaderExample.Shaders;
 using ShaderTranslator;
@@ -12,8 +13,8 @@ namespace ShaderExample
         {
             RenderTranslator translator = new RenderTranslator();
             Shader shader = new LightedVertex();
-
-            translator.RegisterShader(shader, @"C:\Users\Matze\Documents\Git\Master-Thesis\ShaderSim\ShaderExample\Shaders\LightedFragment.cs");
+            string directory = Directory.GetCurrentDirectory();
+            translator.RegisterShader(shader, directory + @"\..\..\Shaders\LightedFragment.cs");
             Console.Read();
 
             //GameWindow window = new GameWindow();
