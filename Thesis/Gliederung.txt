@@ -1,0 +1,29 @@
+nvidia  inside
+pdb shader debug information
+
+
+
+
+
+
+
+Introduction
+- Advantage of Debuging (Debugging is coool!!!)
+- No general tools for debugging shader code with the graphics pipeline exist.
+- Existing Approaches for compute pipeline;
+- Platform specific solutions
+- Target a general solution by using existing debuging tools for other languages translating shader code
+
+Related Work (Which parts of debugging are done how:)
+- Existing debugging methods for shader code with the graphics pipeline
+- Simulation/Translation methods for shader code with the compute pipeline
+- Debug information
+
+Contribution
+-Necessary steps for simulation (shader pipeline)
+-necessary steps for translation
+
+Implementation
+-specific problems with C# and GLSL
+
+
