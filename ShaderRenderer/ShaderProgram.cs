@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using OpenTK.Graphics.OpenGL;
 
-namespace ShaderExample.Graphics
+namespace ShaderRenderer
 {
-    class ShaderProgram
+    public class ShaderProgram
     {
         public int ProgramID = -1;
         public int VShaderID = -1;

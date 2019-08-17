@@ -2,7 +2,7 @@
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 
-namespace ShaderExample.Graphics
+namespace ShaderRenderer
 {
     public struct Texture2D
     {

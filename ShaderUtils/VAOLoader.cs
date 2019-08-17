@@ -6,19 +6,19 @@ namespace ShaderUtils
 {
     public static class VAOLoader
     {
-        public static VertexArrayObject FromMesh(Mesh mesh, Shader vertexShader, RenderWrapper wrapper)
+        public static T FromMesh<T>(Mesh mesh, Tuple<VertexShader, FragmentShader> shader, Object[] args) where T : IVertexArrayObject
         {
-            VertexArrayObject vao = new VertexArrayObject(wrapper);
+            IVertexArrayObject vao = (IVertexArrayObject)Activator.CreateInstance(typeof(T), args);
 
             foreach (KeyValuePair<string, IEnumerable> pair in mesh.Attributes)
             {
                 if (((ICollection)(pair.Value)).Count > 0)
                 {
-                    vao.SetAttribute(pair.Key, vertexShader, (dynamic)pair.Value);
+                    vao.SetAttribute(pair.Key, shader, (dynamic)pair.Value);
                 }
             }
             vao.SetIndex(mesh.IDs);
-            return vao;
+            return (T)vao;
         }
     }
 }

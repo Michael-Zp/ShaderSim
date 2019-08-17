@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{21663E37-0645-4761-87C5-D8D9572D7E8D}</ProjectGuid>
+    <ProjectGuid>{997202F3-A722-4DE5-8F5B-D15DACE0BD98}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>ShaderSimulator</RootNamespace>
-    <AssemblyName>ShaderSimulator</AssemblyName>
+    <RootNamespace>ShaderRenderer</RootNamespace>
+    <AssemblyName>ShaderRenderer</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -36,10 +36,12 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenTK, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenTK.3.1.0\lib\net20\OpenTK.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,19 +50,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BufferObject.cs" />
+    <Compile Include="Disposable.cs" />
+    <Compile Include="Drawer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RenderSimulator.cs" />
-    <Compile Include="SimulatorVAO.cs" />
-    <Compile Include="Triangle.cs" />
+    <Compile Include="ShaderProgram.cs" />
+    <Compile Include="ShaderResourceType.cs" />
+    <Compile Include="Texture2d.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ShaderUtils\ShaderUtils.csproj">
-      <Project>{316d3ef3-7986-4c7b-8705-4ce14c743607}</Project>
-      <Name>ShaderUtils</Name>
-    </ProjectReference>
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

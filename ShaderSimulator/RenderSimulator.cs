@@ -13,6 +13,10 @@ namespace ShaderSimulator
 {
     public class RenderSimulator : RenderWrapper
     {
+        protected readonly Dictionary<IVertexArrayObject, IList<uint>> RenderData;
+        protected readonly Dictionary<Shader, Dictionary<string, IList>> Attributes;
+        protected readonly Dictionary<Shader, Dictionary<string, IList>> InstancedAttributes;
+
         public Bitmap RenderResult { get; private set; }
 
         private readonly MethodInfo _setValueMethod;
@@ -25,11 +29,69 @@ namespace ShaderSimulator
 
         public RenderSimulator()
         {
+            RenderData = new Dictionary<IVertexArrayObject, IList<uint>>();
+            Attributes = new Dictionary<Shader, Dictionary<string, IList>>();
+            InstancedAttributes = new Dictionary<Shader, Dictionary<string, IList>>();
+
             _setValueMethod = typeof(Shader).GetMethod("SetValue");
 
             _vertexPositions = new List<Vector4>();
             _vertexValues = new Dictionary<string, IList>();
             _primitives = new List<Triangle>();
+        }
+
+        public void SetRenderData(SimulatorVAO vao, IEnumerable<uint> data)
+        {
+            if (RenderData.ContainsKey(vao))
+            {
+                RenderData[vao] = (IList<uint>)data;
+            }
+            else
+            {
+                RenderData.Add(vao, (IList<uint>)data);
+            }
+        }
+
+        public void SetAttributes<T>(Shader shader, string name, IEnumerable<T> values, bool perInstance) where T : struct
+        {
+            if (perInstance)
+            {
+                if (InstancedAttributes.ContainsKey(shader))
+                {
+                    if (InstancedAttributes[shader].ContainsKey(name))
+                    {
+                        InstancedAttributes[shader][name] = (IList)values;
+                    }
+                    else
+                    {
+                        InstancedAttributes[shader].Add(name, (IList)values);
+                    }
+                }
+                else
+                {
+                    InstancedAttributes.Add(shader, new Dictionary<string, IList>());
+                    InstancedAttributes[shader].Add(name, (IList)values);
+                }
+            }
+            else
+            {
+                if (Attributes.ContainsKey(shader))
+                {
+                    if (Attributes[shader].ContainsKey(name))
+                    {
+                        Attributes[shader][name] = (IList)values;
+                    }
+                    else
+                    {
+                        Attributes[shader].Add(name, (IList)values);
+                    }
+                }
+                else
+                {
+                    Attributes.Add(shader, new Dictionary<string, IList>());
+                    Attributes[shader].Add(name, (IList)values);
+                }
+            }
         }
 
         public override void DrawElementsInstanced(int instanceCount = 1)

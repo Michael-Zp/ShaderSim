@@ -6,6 +6,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using ShaderRenderer;
 using ShaderUtils;
 using ShaderUtils.Attributes;
 
@@ -13,20 +14,33 @@ namespace ShaderTranslator
 {
     public class RenderTranslator : RenderWrapper
     {
-        public Dictionary<Shader, string> _translatedShaders;
+        public Dictionary<Tuple<VertexShader, FragmentShader>, ShaderProgram> _translatedShaders;
 
         public RenderTranslator()
         {
-            _translatedShaders = new Dictionary<Shader, string>();
+            _translatedShaders = new Dictionary<Tuple<VertexShader, FragmentShader>, ShaderProgram>();
         }
 
-        public void RegisterShader(Shader shader, string shaderFilePath)
+        public void RegisterShader(VertexShader vertex, FragmentShader fragment, string vertexShaderFilePath, string fragmentShaderFilePath)
         {
-            string programText = File.ReadAllText(shaderFilePath);
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(programText).WithFilePath(shaderFilePath);
+            string programText = File.ReadAllText(vertexShaderFilePath);
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(programText).WithFilePath(vertexShaderFilePath);
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-            //ListMembers(((NamespaceDeclarationSyntax)root.Members.First()).Members.First());
-            Console.WriteLine(Translate(root));
+            string vertexTranslation = Translate(root);
+            Console.WriteLine(vertexTranslation);
+
+            programText = File.ReadAllText(fragmentShaderFilePath);
+            tree = CSharpSyntaxTree.ParseText(programText).WithFilePath(fragmentShaderFilePath);
+            root = tree.GetCompilationUnitRoot();
+            string fragmentTranslation = Translate(root);
+            Console.WriteLine(fragmentTranslation);
+
+            //_translatedShaders.Add(new Tuple<VertexShader, FragmentShader>(vertex, fragment), new ShaderProgram());
+        }
+
+        public int GetAttributeBindingID(Tuple<VertexShader, FragmentShader> shader, string name)
+        {
+            return _translatedShaders[shader].GetAttribute(name);
         }
 
         public override void DrawElementsInstanced(int instanceCount = 1)

@@ -53,6 +53,7 @@
     <Compile Include="Attributes\UniformAttribute.cs" />
     <Compile Include="DefaultMesh.cs" />
     <Compile Include="FragmentShader.cs" />
+    <Compile Include="IVertexArrayObject.cs" />
     <Compile Include="Mathematics\Matrix4x4.cs" />
     <Compile Include="Mathematics\Vector2.cs" />
     <Compile Include="Mathematics\Vector3.cs" />
@@ -62,7 +63,6 @@
     <Compile Include="RenderWrapper.cs" />
     <Compile Include="Shader.cs" />
     <Compile Include="VAOLoader.cs" />
-    <Compile Include="VertexArrayObject.cs" />
     <Compile Include="VertexShader.cs" />
   </ItemGroup>
   <ItemGroup>
