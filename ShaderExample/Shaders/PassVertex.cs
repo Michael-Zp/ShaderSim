@@ -7,7 +7,7 @@ namespace ShaderExample.Shaders
     class PassVertex : VertexShader
     {
         [In]
-        public Vector3 InstancePosition { private get; set; }
+        public Matrix4x4 InstanceTransformation { private get; set; }
 
         [In]
         public Vector3 Pos { private get; set; }
@@ -19,7 +19,7 @@ namespace ShaderExample.Shaders
 
         public override void Main()
         {
-            Position = new Vector4(Pos + InstancePosition, 1);
+            Position = (InstanceTransformation * new Vector4(Pos, 1));
             Col = Color;
         }
     }

@@ -25,7 +25,9 @@ namespace ShaderSimulator
 
         public void Draw(int instanceCount = 1)
         {
+            _wrapper.ActivateVAO(this);
             _wrapper.DrawElementsInstanced(instanceCount);
+            _wrapper.DeactivateVAO();
         }
     }
 }

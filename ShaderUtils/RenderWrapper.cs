@@ -5,21 +5,12 @@ namespace ShaderUtils
 {
     public abstract class RenderWrapper
     {
-        public bool DepthEnabled { get; set; } = true;
+        public abstract bool DepthEnabled { get; set; }
 
-        protected readonly Dictionary<string, object> Uniforms;
-
-        protected VertexShader ActiveVertexShader;
-        protected FragmentShader ActiveFragmentShader;
         protected IVertexArrayObject ActiveVAO;
 
         protected int Width;
         protected int Height;
-
-        protected RenderWrapper()
-        {
-            Uniforms = new Dictionary<string, object>();
-        }
 
         public void SetRenderSize(int width, int height)
         {
@@ -27,29 +18,11 @@ namespace ShaderUtils
             Height = height;
         }
 
-        public void SetUniform<T>(string name, T value) where T : struct
-        {
-            if (Uniforms.ContainsKey(name))
-            {
-                Uniforms[name] = value;
-            }
-            else
-            {
-                Uniforms.Add(name, value);
-            }
-        }
+        public abstract void SetUniform<T>(string name, T value) where T : struct;
 
-        public void ActivateShader(VertexShader vertex, FragmentShader fragment)
-        {
-            ActiveVertexShader = vertex;
-            ActiveFragmentShader = fragment;
-        }
+        public abstract void ActivateShader(VertexShader vertex, FragmentShader fragment);
 
-        public void DeactivateShader()
-        {
-            ActiveVertexShader = null;
-            ActiveFragmentShader = null;
-        }
+        public abstract void DeactivateShader();
 
         public void ActivateVAO(IVertexArrayObject vao)
         {
@@ -60,7 +33,5 @@ namespace ShaderUtils
         {
             ActiveVAO = null;
         }
-
-        public abstract void DrawElementsInstanced(int instanceCount = 1);
     }
 }

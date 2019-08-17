@@ -13,9 +13,16 @@ namespace ShaderSimulator
 {
     public class RenderSimulator : RenderWrapper
     {
+        public override bool DepthEnabled { get; set; }
+
+        private readonly Dictionary<string, object> _uniforms;
+
         protected readonly Dictionary<IVertexArrayObject, IList<uint>> RenderData;
         protected readonly Dictionary<Shader, Dictionary<string, IList>> Attributes;
         protected readonly Dictionary<Shader, Dictionary<string, IList>> InstancedAttributes;
+
+        private VertexShader _activeVertexShader;
+        private FragmentShader _activeFragmentShader;
 
         public Bitmap RenderResult { get; private set; }
 
@@ -29,6 +36,8 @@ namespace ShaderSimulator
 
         public RenderSimulator()
         {
+            DepthEnabled = true;
+            _uniforms = new Dictionary<string, object>();
             RenderData = new Dictionary<IVertexArrayObject, IList<uint>>();
             Attributes = new Dictionary<Shader, Dictionary<string, IList>>();
             InstancedAttributes = new Dictionary<Shader, Dictionary<string, IList>>();
@@ -38,6 +47,30 @@ namespace ShaderSimulator
             _vertexPositions = new List<Vector4>();
             _vertexValues = new Dictionary<string, IList>();
             _primitives = new List<Triangle>();
+        }
+
+        public override void ActivateShader(VertexShader vertex, FragmentShader fragment)
+        {
+            _activeVertexShader = vertex;
+            _activeFragmentShader = fragment;
+        }
+
+        public override void DeactivateShader()
+        {
+            _activeVertexShader = null;
+            _activeFragmentShader = null;
+        }
+
+        public override void SetUniform<T>(string name, T value)
+        {
+            if (_uniforms.ContainsKey(name))
+            {
+                _uniforms[name] = value;
+            }
+            else
+            {
+                _uniforms.Add(name, value);
+            }
         }
 
         public void SetRenderData(SimulatorVAO vao, IEnumerable<uint> data)
@@ -94,7 +127,7 @@ namespace ShaderSimulator
             }
         }
 
-        public override void DrawElementsInstanced(int instanceCount = 1)
+        public void DrawElementsInstanced(int instanceCount = 1)
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Reset();
@@ -122,7 +155,7 @@ namespace ShaderSimulator
         {
             if (_setValueMethod != null)
             {
-                foreach (var uniform in Uniforms)
+                foreach (var uniform in _uniforms)
                 {
                     SetUniform(uniform.Key, uniform.Value);
                 }
@@ -132,31 +165,31 @@ namespace ShaderSimulator
         private void SetUniform(string name, object value)
         {
             MethodInfo generic = _setValueMethod.MakeGenericMethod(typeof(UniformAttribute), value.GetType());
-            generic.Invoke(ActiveVertexShader, new object[] { name, value });
-            generic.Invoke(ActiveFragmentShader, new object[] { name, value });
+            generic.Invoke(_activeVertexShader, new object[] { name, value });
+            generic.Invoke(_activeFragmentShader, new object[] { name, value });
         }
 
         private void CalculateVertexStep(int instanceCount)
         {
             for (int i = 0; i < instanceCount; i++)
             {
-                foreach (var instancedAttribute in InstancedAttributes[ActiveVertexShader])
+                foreach (var instancedAttribute in InstancedAttributes[_activeVertexShader])
                 {
-                    SetAttribute(ActiveVertexShader, instancedAttribute.Key, instancedAttribute.Value[i]);
+                    SetAttribute(_activeVertexShader, instancedAttribute.Key, instancedAttribute.Value[i]);
                 }
 
                 for (int j = 0; j < RenderData[ActiveVAO].Count; j++)
                 {
-                    foreach (var attribute in Attributes[ActiveVertexShader])
+                    foreach (var attribute in Attributes[_activeVertexShader])
                     {
-                        SetAttribute(ActiveVertexShader, attribute.Key, attribute.Value[(int)RenderData[ActiveVAO][j]]);
+                        SetAttribute(_activeVertexShader, attribute.Key, attribute.Value[(int)RenderData[ActiveVAO][j]]);
                     }
 
-                    ActiveVertexShader.Main();
+                    _activeVertexShader.Main();
 
-                    _vertexPositions.Add(ActiveVertexShader.Position);
+                    _vertexPositions.Add(_activeVertexShader.Position);
 
-                    foreach (var outValue in ActiveVertexShader.GetOutValues())
+                    foreach (var outValue in _activeVertexShader.GetOutValues())
                     {
                         if (_vertexValues.ContainsKey(outValue.Key))
                         {
@@ -250,7 +283,7 @@ namespace ShaderSimulator
         {
             Vector2 fragSize = new Vector2(2f / Width, 2f / Height);
 
-            return new Vector2(fragSize.X * x + fragSize.X / 2 - 1, -(fragSize.Y * y + fragSize.Y / 2 - 1));
+            return new Vector2(fragSize.X * x + fragSize.X / 2 - 1, fragSize.Y * y + fragSize.Y / 2 - 1);
         }
 
         private Vector3 Barycentric(System.Numerics.Vector2 pos, Triangle triangle)
@@ -314,10 +347,10 @@ namespace ShaderSimulator
                             {
                                 foreach (var key in _fragments[x, y].Keys)
                                 {
-                                    SetAttribute(ActiveFragmentShader, key, _fragments[x, y][key][i]);
+                                    SetAttribute(_activeFragmentShader, key, _fragments[x, y][key][i]);
                                 }
-                                ActiveFragmentShader.Main();
-                                foreach (var outValue in ActiveFragmentShader.GetOutValues())
+                                _activeFragmentShader.Main();
+                                foreach (var outValue in _activeFragmentShader.GetOutValues())
                                 {
                                     if (outValue.Key == FragmentShader.ColorName)
                                     {

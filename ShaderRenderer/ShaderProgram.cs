@@ -1,204 +1,148 @@
-﻿using System;
+﻿using OpenTK.Graphics.OpenGL;
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using OpenTK.Graphics.OpenGL;
 
 namespace ShaderRenderer
 {
-    public class ShaderProgram
+    public class ShaderProgram : Disposable
     {
-        public int ProgramID = -1;
-        public int VShaderID = -1;
-        public int FShaderID = -1;
-        public int AttributeCount = 0;
-        public int UniformCount = 0;
+        /// <summary>The shader ids used for linking</summary>
+        private List<int> shaderIDs = new List<int>();
 
-        public Dictionary<String, AttributeInfo> Attributes = new Dictionary<string, AttributeInfo>();
-        public Dictionary<String, UniformInfo> Uniforms = new Dictionary<string, UniformInfo>();
-        public Dictionary<String, uint> Buffers = new Dictionary<string, uint>();
+        /// <summary>
+        /// Gets a value indicating whether this instance is linked.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance is linked; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsLinked { get; private set; }
 
+        /// <summary>Gets the last log.</summary>
+        /// <value>The last log.</value>
+        public string LastLog { get; private set; }
+
+        /// <summary>Gets the program identifier.</summary>
+        /// <value>The program identifier.</value>
+        public int ProgramID { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:Zenseless.OpenGL.ShaderP" /> class.
+        /// </summary>
         public ShaderProgram()
         {
-            ProgramID = GL.CreateProgram();
+            this.ProgramID = GL.CreateProgram();
         }
 
-        private void loadShader(String code, ShaderType type, out int address)
-        {
-            address = GL.CreateShader(type);
-            GL.ShaderSource(address, code);
-            GL.CompileShader(address);
-            GL.AttachShader(ProgramID, address);
-            Console.WriteLine(GL.GetShaderInfoLog(address));
-        }
-
-        public void LoadShaderFromString(String code, ShaderType type)
-        {
-            if (type == ShaderType.VertexShader)
-            {
-                loadShader(code, type, out VShaderID);
-            }
-            else if (type == ShaderType.FragmentShader)
-            {
-                loadShader(code, type, out FShaderID);
-            }
-        }
-
-        public void LoadShaderFromFile(String filename, ShaderType type)
-        {
-            using (StreamReader sr = new StreamReader(filename))
-            {
-                if (type == ShaderType.VertexShader)
-                {
-                    loadShader(sr.ReadToEnd(), type, out VShaderID);
-                }
-                else if (type == ShaderType.FragmentShader)
-                {
-                    loadShader(sr.ReadToEnd(), type, out FShaderID);
-                }
-            }
-        }
-
-        public void Link()
-        {
-            GL.LinkProgram(ProgramID);
-
-            Console.WriteLine(GL.GetProgramInfoLog(ProgramID));
-
-            GL.GetProgram(ProgramID, GetProgramParameterName.ActiveAttributes, out AttributeCount);
-            GL.GetProgram(ProgramID, GetProgramParameterName.ActiveUniforms, out UniformCount);
-
-            for (int i = 0; i < AttributeCount; i++)
-            {
-                AttributeInfo info = new AttributeInfo();
-                int length = 0;
-
-                GL.GetActiveAttrib(ProgramID, i, 256, out length, out info.size, out info.type, out string name);
-
-                info.name = name;
-                info.address = GL.GetAttribLocation(ProgramID, info.name);
-                Attributes.Add(name, info);
-            }
-
-            for (int i = 0; i < UniformCount; i++)
-            {
-                UniformInfo info = new UniformInfo();
-                int length = 0;
-
-                GL.GetActiveUniform(ProgramID, i, 256, out length, out info.size, out info.type, out string name);
-
-                info.name = name;
-                Uniforms.Add(name, info);
-                info.address = GL.GetUniformLocation(ProgramID, info.name);
-            }
-        }
-
-        public void GenBuffers()
-        {
-            for (int i = 0; i < Attributes.Count; i++)
-            {
-                uint buffer = 0;
-                GL.GenBuffers(1, out buffer);
-
-                Buffers.Add(Attributes.Values.ElementAt(i).name, buffer);
-            }
-
-            for (int i = 0; i < Uniforms.Count; i++)
-            {
-                uint buffer = 0;
-                GL.GenBuffers(1, out buffer);
-
-                Buffers.Add(Uniforms.Values.ElementAt(i).name, buffer);
-            }
-        }
-
-        public void EnableVertexAttribArrays()
-        {
-            for (int i = 0; i < Attributes.Count; i++)
-            {
-                GL.EnableVertexAttribArray(Attributes.Values.ElementAt(i).address);
-            }
-        }
-
-        public void DisableVertexAttribArrays()
-        {
-            for (int i = 0; i < Attributes.Count; i++)
-            {
-                GL.DisableVertexAttribArray(Attributes.Values.ElementAt(i).address);
-            }
-        }
-
-        public int GetAttribute(string name)
-        {
-            if (Attributes.ContainsKey(name))
-            {
-                return Attributes[name].address;
-            }
-            else
-            {
-                return -1;
-            }
-        }
-
-        public int GetUniform(string name)
-        {
-            if (Uniforms.ContainsKey(name))
-            {
-                return Uniforms[name].address;
-            }
-            else
-            {
-                return -1;
-            }
-        }
-
-        public uint GetBuffer(string name)
-        {
-            if (Buffers.ContainsKey(name))
-            {
-                return Buffers[name];
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
-
-
-        public ShaderProgram(String vshader, String fshader, bool fromFile = false)
+        public ShaderProgram(string vertex, string fragment)
         {
             ProgramID = GL.CreateProgram();
 
-            if (fromFile)
-            {
-                LoadShaderFromFile(vshader, ShaderType.VertexShader);
-                LoadShaderFromFile(fshader, ShaderType.FragmentShader);
-            }
-            else
-            {
-                LoadShaderFromString(vshader, ShaderType.VertexShader);
-                LoadShaderFromString(fshader, ShaderType.FragmentShader);
-            }
+            Compile(vertex, ShaderType.VertexShader);
+            Compile(fragment, ShaderType.FragmentShader);
 
             Link();
-            GenBuffers();
         }
 
-        public class UniformInfo
+        /// <summary>Compiles the specified s shader.</summary>
+        /// <param name="sShader">The s shader.</param>
+        /// <param name="type">The type.</param>
+        /// <exception cref="T:Zenseless.HLGL.ShaderCompileException">
+        /// Could not create " + type.ToString() + " object
+        /// or
+        /// Error compiling  " + type.ToString()
+        /// </exception>
+        public void Compile(string sShader, ShaderType type)
         {
-            public String name = "";
-            public int address = -1;
-            public int size = 0;
-            public ActiveUniformType type;
+            this.IsLinked = false;
+            int shader = GL.CreateShader(type);
+            GL.ShaderSource(shader, sShader);
+            GL.CompileShader(shader);
+            int @params;
+            GL.GetShader(shader, ShaderParameter.CompileStatus, out @params);
+            this.LastLog = GL.GetShaderInfoLog(shader);
+            if (1 != @params)
+            {
+                GL.DeleteShader(shader);
+            }
+            GL.AttachShader(this.ProgramID, shader);
+            this.shaderIDs.Add(shader);
         }
 
-        public class AttributeInfo
+        /// <summary>Begins this shader use.</summary>
+        public void Activate()
         {
-            public String name = "";
-            public int address = -1;
-            public int size = 0;
-            public ActiveAttribType type;
+            GL.UseProgram(this.ProgramID);
+        }
+
+        /// <summary>Ends this shader use.</summary>
+        public void Deactivate()
+        {
+            GL.UseProgram(0);
+        }
+
+        /// <summary>Gets the resource location.</summary>
+        /// <param name="resourceType">Type of the resource.</param>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
+        /// <exception cref="T:System.ArgumentOutOfRangeException">Unknown ShaderResourceType</exception>
+        public int GetResourceLocation(ShaderResourceType resourceType, string name)
+        {
+            switch (resourceType)
+            {
+                case ShaderResourceType.Uniform:
+                    return this.GetResourceIndex(name, ProgramInterface.Uniform);
+                case ShaderResourceType.Attribute:
+                    return GL.GetAttribLocation(this.ProgramID, name);
+                case ShaderResourceType.UniformBuffer:
+                    return this.GetResourceIndex(name, ProgramInterface.UniformBlock);
+                case ShaderResourceType.RWBuffer:
+                    return this.GetResourceIndex(name, ProgramInterface.ShaderStorageBlock);
+                default:
+                    throw new ArgumentOutOfRangeException("Unknown ShaderResourceType");
+            }
+        }
+
+        /// <summary>
+        /// Links all compiled shaders to a shader program and deletes them.
+        /// </summary>
+        /// <exception cref="T:Zenseless.HLGL.ShaderException">
+        /// Unknown Link error!
+        /// or
+        /// Error linking shader
+        /// </exception>
+        public void Link()
+        {
+            GL.LinkProgram(this.ProgramID);
+            this.IsLinked = true;
+            this.RemoveShaders();
+        }
+
+        /// <summary>Will be called from the default Dispose method.</summary>
+        protected override void DisposeResources()
+        {
+            if (this.ProgramID == 0)
+                return;
+            GL.DeleteProgram(this.ProgramID);
+        }
+
+        /// <summary>Gets the index of the resource.</summary>
+        /// <param name="name">The name.</param>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        private int GetResourceIndex(string name, ProgramInterface type)
+        {
+            return GL.GetProgramResourceIndex(this.ProgramID, type, name);
+        }
+
+        /// <summary>Removes the shaders.</summary>
+        private void RemoveShaders()
+        {
+            foreach (int shaderId in this.shaderIDs)
+            {
+                GL.DetachShader(this.ProgramID, shaderId);
+                GL.DeleteShader(shaderId);
+            }
+            this.shaderIDs.Clear();
         }
     }
 }

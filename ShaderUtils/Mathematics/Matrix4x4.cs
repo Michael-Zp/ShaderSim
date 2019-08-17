@@ -11,82 +11,82 @@ namespace ShaderUtils.Mathematics
         public Vector4 Column2;
         public Vector4 Column3;
 
-        public float M00
+        public float M11
         {
             get => Column0[0];
             set => Column0[0] = value;
         }
-        public float M01
+        public float M12
         {
             get => Column0[1];
             set => Column0[1] = value;
         }
-        public float M02
+        public float M13
         {
             get => Column0[2];
             set => Column0[2] = value;
         }
-        public float M03
+        public float M14
         {
             get => Column0[3];
             set => Column0[3] = value;
         }
-        public float M10
+        public float M21
         {
             get => Column1[0];
             set => Column1[0] = value;
         }
-        public float M11
+        public float M22
         {
             get => Column1[1];
             set => Column1[1] = value;
         }
-        public float M12
+        public float M23
         {
             get => Column1[2];
             set => Column1[2] = value;
         }
-        public float M13
+        public float M24
         {
             get => Column1[3];
             set => Column1[3] = value;
         }
-        public float M20
+        public float M31
         {
             get => Column2[0];
             set => Column2[0] = value;
         }
-        public float M21
+        public float M32
         {
             get => Column2[1];
             set => Column2[1] = value;
         }
-        public float M22
+        public float M33
         {
             get => Column2[2];
             set => Column2[2] = value;
         }
-        public float M23
+        public float M34
         {
             get => Column2[3];
             set => Column2[3] = value;
         }
-        public float M30
+        public float M41
         {
             get => Column3[0];
             set => Column3[0] = value;
         }
-        public float M31
+        public float M42
         {
             get => Column3[1];
             set => Column3[1] = value;
         }
-        public float M32
+        public float M43
         {
             get => Column3[2];
             set => Column3[2] = value;
         }
-        public float M33
+        public float M44
         {
             get => Column3[3];
             set => Column3[3] = value;
@@ -213,7 +213,7 @@ namespace ShaderUtils.Mathematics
                 {
                     for (int k = 0; k < 4; k++)
                     {
-                        output[i, j] += a[i, k] * b[k, j];
+                        output[j, i] += a[i, k] * b[j, k];
                     }
                 }
             }
@@ -229,7 +229,7 @@ namespace ShaderUtils.Mathematics
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    output[j] += b[i] * a[j, i];
+                    output[j] += b[i] * a[i, j];
                 }
             }
 
@@ -238,13 +238,68 @@ namespace ShaderUtils.Mathematics
 
         public static implicit operator System.Numerics.Matrix4x4(Matrix4x4 mat)
         {
-            return new System.Numerics.Matrix4x4(mat.M00, mat.M01, mat.M02, mat.M03, mat.M10, mat.M11, mat.M12, mat.M13, mat.M20, mat.M21, mat.M22, mat.M23, mat.M30, mat.M31, mat.M32, mat.M33);
+            return new System.Numerics.Matrix4x4(mat.M11, mat.M12, mat.M13, mat.M14, mat.M21, mat.M22, mat.M23, mat.M24, mat.M31, mat.M32, mat.M33, mat.M34, mat.M41, mat.M42, mat.M43, mat.M44);
         }
 
         public static implicit operator Matrix4x4(System.Numerics.Matrix4x4 mat)
         {
             Matrix4x4 result = new Matrix4x4(mat.M11, mat.M12, mat.M13, mat.M14, mat.M21, mat.M22, mat.M23, mat.M24, mat.M31, mat.M32, mat.M33, mat.M34, mat.M41, mat.M42, mat.M43, mat.M44);
             return result;
+        }
+
+        public float[] ToArray()
+        {
+            int num1 = 0;
+            float[] numArray = new float[16];
+            int index1 = num1;
+            int num2 = index1 + 1;
+            numArray[index1] = M11;
+            int index2 = num2;
+            int num3 = index2 + 1;
+            numArray[index2] = M21;
+            int index3 = num3;
+            int num4 = index3 + 1;
+            numArray[index3] = M31;
+            int index4 = num4;
+            int num5 = index4 + 1;
+            numArray[index4] = M41;
+            int index5 = num5;
+            int num6 = index5 + 1;
+            numArray[index5] = M12;
+            int index6 = num6;
+            int num7 = index6 + 1;
+            numArray[index6] = M22;
+            int index7 = num7;
+            int num8 = index7 + 1;
+            numArray[index7] = M32;
+            int index8 = num8;
+            int num9 = index8 + 1;
+            numArray[index8] = M42;
+            int index9 = num9;
+            int num10 = index9 + 1;
+            numArray[index9] = M13;
+            int index10 = num10;
+            int num11 = index10 + 1;
+            numArray[index10] = M23;
+            int index11 = num11;
+            int num12 = index11 + 1;
+            numArray[index11] = M33;
+            int index12 = num12;
+            int num13 = index12 + 1;
+            numArray[index12] = M43;
+            int index13 = num13;
+            int num14 = index13 + 1;
+            numArray[index13] = M14;
+            int index14 = num14;
+            int num15 = index14 + 1;
+            numArray[index14] = M24;
+            int index15 = num15;
+            int num16 = index15 + 1;
+            numArray[index15] = M34;
+            int index16 = num16;
+            int num17 = index16 + 1;
+            numArray[index16] = M44;
+            return numArray;
         }
     }
 }

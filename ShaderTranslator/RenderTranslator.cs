@@ -6,19 +6,84 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using OpenTK.Graphics.OpenGL4;
 using ShaderRenderer;
 using ShaderUtils;
 using ShaderUtils.Attributes;
+using ShaderUtils.Mathematics;
 
 namespace ShaderTranslator
 {
     public class RenderTranslator : RenderWrapper
     {
+        private bool _depthEnabled;
+
+        public override bool DepthEnabled
+        {
+            get => _depthEnabled;
+            set
+            {
+                _depthEnabled = value;
+                if (_depthEnabled)
+                {
+                    GL.Enable(EnableCap.DepthTest);
+                }
+                else
+                {
+                    GL.Disable(EnableCap.DepthTest);
+                }
+            }
+        }
+
         public Dictionary<Tuple<VertexShader, FragmentShader>, ShaderProgram> _translatedShaders;
+
+        private VertexShader _activeVertexShader;
+        private FragmentShader _activeFragmentShader;
 
         public RenderTranslator()
         {
+            DepthEnabled = true;
             _translatedShaders = new Dictionary<Tuple<VertexShader, FragmentShader>, ShaderProgram>();
+        }
+
+        public override void ActivateShader(VertexShader vertex, FragmentShader fragment)
+        {
+            _activeVertexShader = vertex;
+            _activeFragmentShader = fragment;
+            _translatedShaders[new Tuple<VertexShader, FragmentShader>(_activeVertexShader, _activeFragmentShader)].Activate();
+        }
+
+        public override void DeactivateShader()
+        {
+            _translatedShaders[new Tuple<VertexShader, FragmentShader>(_activeVertexShader, _activeFragmentShader)].Deactivate();
+            _activeVertexShader = null;
+            _activeFragmentShader = null;
+        }
+
+        public override void SetUniform<T>(string name, T value)
+        {
+            int bindingID = _translatedShaders[new Tuple<VertexShader, FragmentShader>(_activeVertexShader, _activeFragmentShader)].GetResourceLocation(ShaderResourceType.Uniform, name);
+
+            if (typeof(T) == typeof(float))
+            {
+                GL.Uniform1(bindingID, (float)(object)value);
+            }
+            if (typeof(T) == typeof(Vector2))
+            {
+                GL.Uniform2(bindingID, ((Vector2)(object)value).ToOpenTK());
+            }
+            if (typeof(T) == typeof(Vector3))
+            {
+                GL.Uniform3(bindingID, ((Vector3)(object)value).ToOpenTK());
+            }
+            if (typeof(T) == typeof(Vector4))
+            {
+                GL.Uniform4(bindingID, ((Vector4)(object)value).ToOpenTK());
+            }
+            if (typeof(T) == typeof(Matrix4x4))
+            {
+                GL.UniformMatrix4(bindingID, 1, false, ((Matrix4x4)(object)value).ToArray());
+            }
         }
 
         public void RegisterShader(VertexShader vertex, FragmentShader fragment, string vertexShaderFilePath, string fragmentShaderFilePath)
@@ -35,17 +100,12 @@ namespace ShaderTranslator
             string fragmentTranslation = Translate(root);
             Console.WriteLine(fragmentTranslation);
 
-            //_translatedShaders.Add(new Tuple<VertexShader, FragmentShader>(vertex, fragment), new ShaderProgram());
+            _translatedShaders.Add(new Tuple<VertexShader, FragmentShader>(vertex, fragment), new ShaderProgram(vertexTranslation, fragmentTranslation));
         }
 
         public int GetAttributeBindingID(Tuple<VertexShader, FragmentShader> shader, string name)
         {
-            return _translatedShaders[shader].GetAttribute(name);
-        }
-
-        public override void DrawElementsInstanced(int instanceCount = 1)
-        {
-            throw new NotImplementedException();
+            return _translatedShaders[shader].GetResourceLocation(ShaderResourceType.Attribute, name);
         }
 
         private void ListMembers(SyntaxNode node, int depth = 0)

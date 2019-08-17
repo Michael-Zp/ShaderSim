@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BufferObject.cs" />
+    <Compile Include="CastExtensions.cs" />
     <Compile Include="Disposable.cs" />
     <Compile Include="Drawer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -62,6 +63,12 @@
     <None Include="App.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ShaderUtils\ShaderUtils.csproj">
+      <Project>{316d3ef3-7986-4c7b-8705-4ce14c743607}</Project>
+      <Name>ShaderUtils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
