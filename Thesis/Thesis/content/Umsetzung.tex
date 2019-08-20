@@ -1,0 +1,37 @@
+%!TEX root = ../dokumentation.tex
+
+\chapter{Umsetzung}\label{cha:Umsetzung}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+
+Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. 
+
+Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. 
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{| l | l | l | l |}
+		\hline
+		\rowcolor[HTML]{3531FF} 
+		\multicolumn{1}{|l|}{\cellcolor[HTML]{4F88BB}{\color[HTML]{FFFFFF} {\textbf{Runmode}}}} & \multicolumn{1}{l|}{\cellcolor[HTML]{4F88BB}{\color[HTML]{FFFFFF} {\textbf{Handlers}}}} & \multicolumn{1}{l|}{\cellcolor[HTML]{4F88BB}{\color[HTML]{FFFFFF} {\textbf{Loglevel}}}} & \multicolumn{1}{l|}{\cellcolor[HTML]{4F88BB}{\color[HTML]{FFFFFF} {\textbf{Formatter}}}} \\ \hline
+		\textbf{DEBUG} & \footnotemark[2].ConsoleHandler & ALL & \footnotemark[2].SimpleFormatter \\  \hline
+		\textbf{TEST} & \footnotemark[2].FileHandler & WARNING & \footnotemark[2].SimpleFormatter \\ \hline
+		\textbf{LIVE} & \footnotemark[2].FileHandler & SEVERE & \footnotemark[2].SimpleFormatter \\  \hline
+	\end{tabular}
+	\caption{Logger Einstellungen für die einzelnen Runmodes}
+	\label{tbl:LoggerSettingsRunmode}
+\end{table}
+\footnotetext[2]{java.util.logging}
+
+\flqq Gegeben seien die Wertepaare $(x_1,y_1), \dots,(x_n,y_n)$, wobei nicht alle $x_i$ gleich sind bzw. nicht alle $y_i$ gleich sind. Die Zahl
+\begin{equation*}
+r_{xy} = \frac{s_{xy}}{s_x \cdot s_y}
+\end{equation*} 
+heißt \textbf{(empirischer) Korrelationskoeffizient} oder \textbf{Pearson'scher Korrelationskoeffizient}. Dabei ist
+\begin{equation*}
+s_{xy} = \frac{1}{n-1} \displaystyle\sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})
+\end{equation*}
+die \textbf{(empirische) Kovarianz}, $\bar{x}$, $\bar{y}$ sind die arithmetischen Mittelwerte und
+\begin{equation*}
+s_x = \sqrt{\frac{1}{n-1} \displaystyle\sum_{i=1}^{n} (x_i - \bar{x})^2}, \quad s_y = \sqrt{\frac{1}{n-1} \displaystyle\sum_{i=1}^{n} (y_i - \bar{y})^2}
+\end{equation*}
+sind die (empirischen) Standardabweichungen der $x_i$ bzw. der $y_i$-Werte.\frqq\footcite[S. 213]{Teschl.2014}

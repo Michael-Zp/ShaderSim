@@ -213,7 +213,7 @@ namespace ShaderUtils.Mathematics
                 {
                     for (int k = 0; k < 4; k++)
                     {
-                        output[j, i] += a[i, k] * b[j, k];
+                        output[i, j] += a[i, k] * b[k, j];
                     }
                 }
             }
@@ -229,7 +229,7 @@ namespace ShaderUtils.Mathematics
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    output[j] += b[i] * a[i, j];
+                    output[j] += b[i] * a[j, i];
                 }
             }
 

@@ -85,8 +85,15 @@ namespace ShaderSimulator
             }
         }
 
-        public void SetAttributes<T>(Shader shader, string name, IEnumerable<T> values, bool perInstance) where T : struct
+        public void SetAttributes<T>(Shader shader, string name, IList<T> values, bool perInstance) where T : struct
         {
+            if (typeof(T) == typeof(Matrix4x4))
+            {
+                for (int i = 0; i < values.Count(); i++)
+                {
+                    values[i] = (T)(object)(Matrix4x4)System.Numerics.Matrix4x4.Transpose((Matrix4x4)(object)values[i]);
+                }
+            }
             if (perInstance)
             {
                 if (InstancedAttributes.ContainsKey(shader))

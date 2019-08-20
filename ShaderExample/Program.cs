@@ -18,7 +18,7 @@ namespace ShaderExample
 
             GameWindow window = new GameWindow();
             Model model = new Model();
-            View view = new View(true);
+            View view = new View();
 
             window.UpdateFrame += (s, e) => model.Update((float)e.Time);
             window.RenderFrame += (s, e) => view.Render(model.Entities);

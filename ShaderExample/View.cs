@@ -41,10 +41,10 @@ namespace ShaderExample
         public void Render(IEnumerable<Entity> entities)
         {
             Dictionary<IVertexArrayObject, int> vaoInformations = PrepareVAOs(entities);
-            _camera.Position = new System.Numerics.Vector3(0f, 0f, 1f);
+            _camera.Position = new System.Numerics.Vector3(0.15f, 0.5f, 1f);
             _wrapper.ActivateShader(_vertex, _fragment);
-            //_wrapper.SetUniform("Camera", (Matrix4x4)_camera.CalcMatrix());
-            _wrapper.SetUniform("Camera", (Matrix4x4)System.Numerics.Matrix4x4.Transpose(System.Numerics.Matrix4x4.CreateTranslation(new System.Numerics.Vector3(0f, -0.5f, 0))));
+            _wrapper.SetUniform("Camera", (Matrix4x4)_camera.CalcMatrix());
+            //_wrapper.SetUniform("Camera", (Matrix4x4)System.Numerics.Matrix4x4.Transpose(System.Numerics.Matrix4x4.CreateTranslation(new System.Numerics.Vector3(0f, -0.5f, 0))));
 
             List<Texture2D> layers = new List<Texture2D>();
 

@@ -1,0 +1,38 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\babel@toc {english}{}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{\nonumberline Explanation of debugging}{1}{section*.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{\nonumberline Problem with debugging of shaders in the graphics pipeline}{1}{section*.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{\nonumberline Existing approach for compute shaders}{2}{section*.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{\nonumberline Objective of creating a general solution for debuging shaders in the graphics pipeline}{2}{section*.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {2}Related Work}{3}{chapter.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{\nonumberline Existing methods for debugging shaders in the graphics pipeline}{3}{section*.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{\nonumberline Approaches for translating and simulating compute shaders}{3}{section*.8}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {3}Contribution}{4}{chapter.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{\nonumberline Steps for simulating the graphics pipeline}{4}{section*.9}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{\nonumberline Steps for translating the shader code}{4}{section*.10}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {4}Implementation}{5}{chapter.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {5}Conclusion}{6}{chapter.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline Acronyms}{i}{chapter*.11}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline List of Figures}{iii}{chapter*.12}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline List of Tables}{iv}{chapter*.13}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline Bibliography}{v}{chapter*.14}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline Appendix}{vi}{chapter*.15}

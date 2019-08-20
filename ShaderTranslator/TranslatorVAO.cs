@@ -47,7 +47,7 @@ namespace ShaderTranslator
             this.IDLength = data.Count();
         }
 
-        public void SetAttribute<T>(string name, Tuple<VertexShader, FragmentShader> shader, IEnumerable<T> data, bool perInstance = false) where T : struct
+        public void SetAttribute<T>(string name, Tuple<VertexShader, FragmentShader> shader, IList<T> data, bool perInstance = false) where T : struct
         {
             int bindingID = _wrapper.GetAttributeBindingID(shader, name);
 

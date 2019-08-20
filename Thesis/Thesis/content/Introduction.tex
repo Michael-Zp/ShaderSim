@@ -1,0 +1,25 @@
+%!TEX root = ../dokumentation.tex
+
+\chapter{Introduction}\label{cha:Introduction}
+
+\paragraph{Explanation of debugging}
+
+"Debuging is the process of locating and removing faults in computer programs" accorrding to \myCite{Collins.2014}. In the following only ways of debugging software problems are considered.Excluding specialized debugging hardware. The steps that are part of the debugging process are reproducing the problem, identifying the source of the problem and fixing the problem. All of these steps can be done manually but there are ways to improve and accelerate this process.
+
+To find a way to reproduce the problem there is the option of  writing tests with aberations, inserting debug outputs on the console into the source code or writing states into log files. This enables the programmer to find anomalys before, while and after running the program. 
+
+After being able to reproduce a problem to find the source of the problem there is the option of increasing the amount of debug outputs to confine the point in the code at which the error occurs.
+
+For most programming languages there are tools to assist the programmer to narrow down the source of the bug with multiple methos.
+
+One method is to enable the user to set breakpoints at which the programm pauses and he can inspect the values of the variables directly within the code and restart the programm to move to the next breakpoint or go through the single steps of the programm. By stepping through the code this way the point where the error occurs can be found.
+
+Another way to simplify the task is to have the code throw an exception when unwanted behavior occurs and stop at this exception. By saving a stack of the calls which occured before the exception was trown the programmer can retrace in which lines of coude the error may be found.
+
+//TODO ReverseDebugging
+
+\paragraph{Problem with debugging of shaders in the graphics pipeline}
+
+\paragraph{Existing approach for compute shaders}
+
+\paragraph{Objective of creating a general solution for debuging shaders in the graphics pipeline}

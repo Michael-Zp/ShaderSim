@@ -18,7 +18,7 @@ namespace ShaderSimulator
             _wrapper.SetRenderData(this, data);
         }
 
-        public void SetAttribute<T>(string name, Tuple<VertexShader, FragmentShader> shader, IEnumerable<T> data, bool perInstance = false) where T : struct
+        public void SetAttribute<T>(string name, Tuple<VertexShader, FragmentShader> shader, IList<T> data, bool perInstance = false) where T : struct
         {
             _wrapper.SetAttributes(shader.Item1, name, data, perInstance);
         }
