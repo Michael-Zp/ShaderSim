@@ -147,7 +147,7 @@ namespace ShaderSimulator
             RenderResult = CalculateFragmentStep();
 
             stopwatch.Stop();
-            Console.WriteLine($"Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.Milliseconds}");
+            Console.WriteLine($"Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
 
             Attributes.Clear();
             InstancedAttributes.Clear();
@@ -194,7 +194,7 @@ namespace ShaderSimulator
 
                     _activeVertexShader.Main();
 
-                    _vertexPositions.Add(_activeVertexShader.Position);
+                    _vertexPositions.Add(_activeVertexShader.Position * (1 / _activeVertexShader.Position.W));
 
                     foreach (var outValue in _activeVertexShader.GetOutValues())
                     {
@@ -271,14 +271,53 @@ namespace ShaderSimulator
                                     _fragments[x, y].Add(key, new List<object>());
                                 }
 
-                                MethodInfo mult = primitive[0][key].GetType().GetMethod("op_Multiply", new Type[] { primitive[0][key].GetType(), typeof(float) });
-                                MethodInfo add = primitive[0][key].GetType().GetMethod("op_Addition", new Type[] { primitive[0][key].GetType(), primitive[0][key].GetType() });
-                                var value0 = mult.Invoke(primitive[0][key], new object[] { primitive[0][key], baricentric.X });
-                                var value1 = mult.Invoke(primitive[1][key], new object[] { primitive[1][key], baricentric.Y });
-                                var value2 = mult.Invoke(primitive[2][key], new object[] { primitive[2][key], baricentric.Z });
-                                var add1 = add.Invoke(value0, new object[] { value0, value1 });
-                                var add2 = add.Invoke(add1, new object[] { add1, value2 });
-                                _fragments[x, y][key].Add(add2);
+                                switch (primitive[0][key])
+                                {
+                                    case float _:
+                                        {
+                                            var p0 = (float)primitive[0][key] * baricentric.X;
+                                            var p1 = (float)primitive[1][key] * baricentric.Y;
+                                            var p2 = (float)primitive[2][key] * baricentric.Z;
+                                            _fragments[x, y][key].Add(p0 + p1 + p2);
+                                            break;
+                                        }
+                                    case Vector2 _:
+                                        {
+                                            var p0 = (Vector2)primitive[0][key] * baricentric.X;
+                                            var p1 = (Vector2)primitive[1][key] * baricentric.Y;
+                                            var p2 = (Vector2)primitive[2][key] * baricentric.Z;
+                                            _fragments[x, y][key].Add(p0 + p1 + p2);
+                                            break;
+                                        }
+                                    case Vector3 _:
+                                        {
+                                            var p0 = (Vector3)primitive[0][key] * baricentric.X;
+                                            var p1 = (Vector3)primitive[1][key] * baricentric.Y;
+                                            var p2 = (Vector3)primitive[2][key] * baricentric.Z;
+                                            _fragments[x, y][key].Add(p0 + p1 + p2);
+                                            break;
+                                        }
+                                    case Vector4 _:
+                                        {
+                                            var p0 = (Vector4)primitive[0][key] * baricentric.X;
+                                            var p1 = (Vector4)primitive[1][key] * baricentric.Y;
+                                            var p2 = (Vector4)primitive[2][key] * baricentric.Z;
+                                            _fragments[x, y][key].Add(p0 + p1 + p2);
+                                            break;
+                                        }
+                                    default:
+                                        {
+                                            MethodInfo mult = primitive[0][key].GetType().GetMethod("op_Multiply", new Type[] { primitive[0][key].GetType(), typeof(float) });
+                                            MethodInfo add = primitive[0][key].GetType().GetMethod("op_Addition", new Type[] { primitive[0][key].GetType(), primitive[0][key].GetType() });
+                                            var value0 = mult.Invoke(primitive[0][key], new object[] { primitive[0][key], baricentric.X });
+                                            var value1 = mult.Invoke(primitive[1][key], new object[] { primitive[1][key], baricentric.Y });
+                                            var value2 = mult.Invoke(primitive[2][key], new object[] { primitive[2][key], baricentric.Z });
+                                            var add1 = add.Invoke(value0, new object[] { value0, value1 });
+                                            var add2 = add.Invoke(add1, new object[] { add1, value2 });
+                                            _fragments[x, y][key].Add(add2);
+                                            break;
+                                        }
+                                }
                             }
                         }
                     }

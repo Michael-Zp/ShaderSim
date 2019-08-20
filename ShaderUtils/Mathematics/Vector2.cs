@@ -190,6 +190,7 @@ namespace ShaderUtils.Mathematics
                 Y = (float)(a - b.Y),
             };
         }
+
         public static Vector2 operator -(Vector2 a, float b)
         {
             return new Vector2()

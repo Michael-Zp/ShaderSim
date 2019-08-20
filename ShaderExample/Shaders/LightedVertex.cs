@@ -34,7 +34,6 @@ namespace ShaderExample.Shaders
         {
             WorldPos = (InstanceTransformation * new Vector4(Pos, 1)).XYZ;
             N = (InstanceTransformation * new Vector4(Normal, 0)).XYZ;
-            Matrix4x4 test = Camera * InstanceTransformation;
             Position = Camera * InstanceTransformation * new Vector4(Pos, 1);
             Col = Color;
         }
