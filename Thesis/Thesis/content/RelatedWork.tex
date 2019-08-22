@@ -4,5 +4,16 @@
 \section{Existing methods for debugging shaders in the graphics pipeline}
 \label{section:debuggingMethods}
 
+For debugging a shader program within the graphics pipeline there is the option to use workarounds to get the values of the variables within the code or by using special drivers provided by the producers of the hardware to get the option to debug on this hardware.
+
+\paragraph{Manual debugging with workarounds}
+
+The manual way of debugging a shader is by creating outputs of the values within the shader program to see anomalies in their values. This can't be done by writing these values on the console or in a log file like it would be done in a CPU based application because there is no access to the console or a logger within a shader program. The workaround used here is to return the values projected on the rgba-color values on the resulting image of the program. In this way the programmer can see the rough area in which the values are located on the direct output. The image can also be saved and inspected closer to get the exact values within the pixels of the resulting image.\myCite{Ciardi.2015}
+
+\paragraph{Debugging with special drivers on certain hardware}
+\label{section:debuggingMethods_drivers}
+
+It is possible to install special drivers for certain graphics cards provided by their producers to enable debugging of shaders running on this hardware within dedicated environments. The two big suppliers of graphics hardware Nvida and AMD provide these debugging environments in the form of \cite{Nvidia_Nsight} and \cite{AMD_GPUPerfStudio}. These tools can be included into different IDEs or downloaded as standalone applications to enable the use of breakpoints and the inspection of variables within the shader code at runtime. One disadvantage with this method is that not all graphics cards are supported with such drivers and tools by their producer.
+
 \section{Approaches for translating and simulating compute shaders}
 \label{section:computeApproaches}
