@@ -1,25 +1,55 @@
-%!TEX root = ../dokumentation.tex
+ %!TEX root = ../dokumentation.tex
 
 \chapter{Introduction}\label{cha:Introduction}
 
 \paragraph{Explanation of debugging}
+\label{paragraph:debuging}
 
-"Debuging is the process of locating and removing faults in computer programs" accorrding to \myCite{Collins.2014}. In the following only ways of debugging software problems are considered.Excluding specialized debugging hardware. The steps that are part of the debugging process are reproducing the problem, identifying the source of the problem and fixing the problem. All of these steps can be done manually but there are ways to improve and accelerate this process.
+"Debugging is the process of locating and removing faults in computer programs" according to \myCite{Collins_debugging.2014}. The steps that are part of the debugging process are reproducing the problem, identifying the source of the problem and fixing the problem. All of these steps can be done manually but there are ways to improve and accelerate this process.
 
-To find a way to reproduce the problem there is the option of  writing tests with aberations, inserting debug outputs on the console into the source code or writing states into log files. This enables the programmer to find anomalys before, while and after running the program. 
+To find a way to reproduce the problem there is the option of writing automated tests, inserting debug outputs on the console into the source code or writing states into log files. This enables the programmer to find anomalies before, while and after running the program. 
 
-After being able to reproduce a problem to find the source of the problem there is the option of increasing the amount of debug outputs to confine the point in the code at which the error occurs.
+To find the source of the reproducible problem the manual way is to increase the amount of debug outputs around the problematic part of the code to confine the point in the code at which the error occurs.
 
-For most programming languages there are tools to assist the programmer to narrow down the source of the bug with multiple methos.
+For most programming languages there are tools to aid the programmer to narrow down the source of the bug with multiple methods.
 
-One method is to enable the user to set breakpoints at which the programm pauses and he can inspect the values of the variables directly within the code and restart the programm to move to the next breakpoint or go through the single steps of the programm. By stepping through the code this way the point where the error occurs can be found.
+One method is to enable the user to set breakpoints at which the program pauses and he can inspect the values of the variables directly within the code. By continuing the program to move to the next breakpoint or by going forward through the code step by step the point where the error occurs can be found.\myCite{Undo.2019}
 
-Another way to simplify the task is to have the code throw an exception when unwanted behavior occurs and stop at this exception. By saving a stack of the calls which occured before the exception was trown the programmer can retrace in which lines of coude the error may be found.
+Another way to simplify the task is to have the code throw an exception when unwanted behavior occurs and stop at this exception. By saving a stack of the calls which occurred before the exception was thrown the programmer can retrace in which lines of code the error may be found.\myCite{Jetbrains.2019}
 
-//TODO ReverseDebugging
+Reverse debugging records all program activities and thereby it is possible to move backwards in addition to forward stepping from a set breakpoint and see the changes in the variables and the calls in the code leading to the problem.\myCite{Undo.2019}
+
+When the source of the problem is found the final step, of fixing the problem, is simply to correct the code. "Everyone knows that debugging is twice as hard as writing a program in the first place. So if you're as clever as you can be when you write it, how will you ever debug it?" according to \myCite{Kernighan.1982}. The core of this statement is that creating and changing code is easier than finding bugs in your code.
 
 \paragraph{Problem with debugging of shaders in the graphics pipeline}
 
-\paragraph{Existing approach for compute shaders}
+A Shader is a program running on the GPU thereby mostly running as part of the graphics pipeline also known as rendering pipeline.\myCite{Khronos_shader.2019} The exception for this behavior is the compute shader which is independent from the graphics pipeline.\myCite{Khronos_compute.2019}
+
+There are ways to debug Shaders on the graphics pipeline, as shown in Section \ref{section:debuggingMethods}, but there are no general solutions for aiding the user in the debugging process.\myCite{Ciardi.2015}
+
+While most CPUs are very broad in their functionality and support debugging by itself a GPU is more specialized in the way it functions and usually does not have the option to pause the code to enable inspections at runtime.\myCite{Fox.2017} As explained in more detail in Section \ref{section:debuggingMethods} it is possible to enable debugging on the GPU with specialized hardware and drivers for said hardware.\myCite{Nvidia_debug.2019}\myCite{Microsoft_debug.2016}
+
+\paragraph{Existing approaches for compute shaders}
+
+There are approaches which enable debugging of compute shader code by translating it from another language, as explained in section \ref{section:computeApproaches} in more detail. The code is written in a debuggable language for the CPU, so it can be debugged running on the CPU. The code is then translated to the shader language and run as a compute shader on the GPU.
 
 \paragraph{Objective of creating a general solution for debuging shaders in the graphics pipeline}
+
+The objective of this work is to create a general solution to enable debugging of shaders within the graphics pipeline. The goals this solution should fulfill are the following:
+
+\begin{itemize}
+	\item The different methods to assist the programmer in debugging mentioned in Section \ref{paragraph:debuging} are usable.
+	\item It is possible to switch between a mode where debugging is enabled and a mode where the shaders run as usual without interference of the debugger.
+	\item The resulting output per render iteration of the debugger is close to the output of the program with the undebugged shader. It is close enough that the programmer can see what the rendering result without the debugger would look like. Errors like those resulting from the use of float variables with their inaccuracies are tolerable because there are tolerances within human perception where minimal changes in position or color within a rendered result do not matter.\myCite{Franz.2006}
+	\item Performance is not a major requirement while running the debugger. It is possible to see the output and the values of the shader within each frame and iterate through the frames. It is not necessary to view the result in the speed of the final application while debugging. The programmer uses time to inspect the values within the shader which would not be possible with changing variables at high speeds like the 60 frames per second a usual graphics application has.\myCite{Christensson.2015} The debug application should fulfil the acceptable response times for user interfaces as described by \myCite{Nielson.1993}.
+\end{itemize}
+
+The proposed solution of this work is inspired by the translating approaches for compute shaders described in \ref{section:computeApproaches}. The code for the shaders is written in a language which supports the different methods for assisting with debugging.
+
+To enable the functionality while debugging, the linking of the shaders and the steps in between the shaders on the graphics pipeline, usually already provided by the graphics hardware, will be simulated in the other language.
+
+To run the shader as usual on the GPU the shaders written in the debuggable language is translated to the shader language and loaded on the hardware.
+
+
+
+

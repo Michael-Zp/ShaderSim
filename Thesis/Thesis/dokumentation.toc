@@ -5,34 +5,34 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{\nonumberline Explanation of debugging}{1}{section*.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Problem with debugging of shaders in the graphics pipeline}{1}{section*.4}
+\contentsline {paragraph}{\nonumberline Problem with debugging of shaders in the graphics pipeline}{2}{section*.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Existing approach for compute shaders}{2}{section*.5}
+\contentsline {paragraph}{\nonumberline Existing approaches for compute shaders}{2}{section*.5}
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{\nonumberline Objective of creating a general solution for debuging shaders in the graphics pipeline}{2}{section*.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {2}Related Work}{3}{chapter.2}
+\contentsline {chapter}{\numberline {2}Related Work}{4}{chapter.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.1}Existing methods for debugging shaders in the graphics pipeline}{3}{section.2.1}
+\contentsline {section}{\numberline {2.1}Existing methods for debugging shaders in the graphics pipeline}{4}{section.2.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.2}Approaches for translating and simulating compute shaders}{3}{section.2.2}
+\contentsline {section}{\numberline {2.2}Approaches for translating and simulating compute shaders}{4}{section.2.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {3}Contribution}{4}{chapter.3}
+\contentsline {chapter}{\numberline {3}Contribution}{5}{chapter.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Steps for simulating the graphics pipeline}{4}{section*.7}
+\contentsline {paragraph}{\nonumberline Steps for simulating the graphics pipeline}{5}{section*.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Steps for translating the shader code}{4}{section*.8}
+\contentsline {paragraph}{\nonumberline Steps for translating the shader code}{5}{section*.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Implementation}{5}{chapter.4}
+\contentsline {chapter}{\numberline {4}Implementation}{6}{chapter.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Conclusion}{6}{chapter.5}
+\contentsline {chapter}{\numberline {5}Conclusion}{7}{chapter.5}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\nonumberline Acronyms}{i}{chapter*.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline List of Figures}{iii}{chapter*.10}
+\contentsline {chapter}{\nonumberline List of Figures}{ii}{chapter*.10}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline List of Tables}{iv}{chapter*.11}
+\contentsline {chapter}{\nonumberline List of Tables}{iii}{chapter*.11}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline Bibliography}{v}{chapter*.12}
+\contentsline {chapter}{\nonumberline Bibliography}{iv}{chapter*.12}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\nonumberline Appendix}{vi}{chapter*.13}
