@@ -17,6 +17,19 @@
 \endgroup
 
 \datalist[entry]{nyt/global//global/global}
+  \entry{Campy}{online}{}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{title}{Campy}
+    \verb{url}
+    \verb http://campynet.com/
+    \endverb
+    \field{urlday}{24}
+    \field{urlmonth}{08}
+    \field{urlyear}{2019}
+  \endentry
+
   \entry{Christensson.2015}{online}{}
     \name{author}{1}{}{%
       {{hash=CP}{%
@@ -151,6 +164,41 @@
     \field{urlyear}{2019}
   \endentry
 
+  \entry{GLSL_debugger}{online}{}
+    \name{author}{1}{}{%
+      {{hash=GD}{%
+         family={GLSL-Debugger},
+         familyi={G\bibinitperiod-D\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{GD1}
+    \strng{fullhash}{GD1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{title}{GLSL-Debugger}
+    \verb{url}
+    \verb http://glsl-debugger.github.io/#features
+    \endverb
+    \field{urlday}{23}
+    \field{urlmonth}{08}
+    \field{urlyear}{2019}
+  \endentry
+
+  \entry{GLSLplusplus}{online}{}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{title}{GLSLplusplus}
+    \verb{url}
+    \verb https://github.com/AlexanderDzhoganov/GLSLplusplus
+    \endverb
+    \field{urlday}{24}
+    \field{urlmonth}{08}
+    \field{urlyear}{2019}
+  \endentry
+
   \entry{AMD_GPUPerfStudio}{online}{}
     \field{labeltitlesource}{title}
     \field{sortinit}{G}
@@ -160,6 +208,19 @@
     \verb https://gpuopen.com/archive/gpu-perfstudio/
     \endverb
     \field{urlday}{22}
+    \field{urlmonth}{08}
+    \field{urlyear}{2019}
+  \endentry
+
+  \entry{ILGPU}{online}{}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{I}
+    \field{sortinithash}{I}
+    \field{title}{ILGPU}
+    \verb{url}
+    \verb http://www.ilgpu.net/
+    \endverb
+    \field{urlday}{24}
     \field{urlmonth}{08}
     \field{urlyear}{2019}
   \endentry
@@ -185,6 +246,64 @@
     \endverb
     \field{year}{2019}
     \field{urlday}{21}
+    \field{urlmonth}{08}
+    \field{urlyear}{2019}
+  \endentry
+
+  \entry{Fumero.2017}{article}{}
+    \name{author}{1}{}{%
+      {{hash=JFLSMS}{%
+         family={Juan\bibnamedelima Fumero},
+         familyi={J\bibinitperiod\bibinitdelim F\bibinitperiod},
+         suffix={Michael\bibnamedelima Stuewer},
+         suffixi={M\bibinitperiod\bibinitdelim S\bibinitperiod},
+         given={Lukas\bibnamedelima Stadler},
+         giveni={L\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{JFMSLS1}
+    \strng{fullhash}{JFMSLS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2017}
+    \field{labeldatesource}{year}
+    \field{sortinit}{J}
+    \field{sortinithash}{J}
+    \field{title}{Just-In-Time GPU Compilation forInterpreted Languages with
+  Partial Evaluation}
+    \verb{url}
+    \verb https://michel.steuwer.info/files/publications/2017/VEE-2017.pdf
+    \endverb
+    \field{year}{2017}
+    \field{urlday}{24}
+    \field{urlmonth}{08}
+    \field{urlyear}{2019}
+  \endentry
+
+  \entry{Jukka.2012}{article}{}
+    \name{author}{1}{}{%
+      {{hash=JJ}{%
+         family={Jukka},
+         familyi={J\bibinitperiod},
+         given={Julku},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{JJ1}
+    \strng{fullhash}{JJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2012}
+    \field{labeldatesource}{year}
+    \field{sortinit}{J}
+    \field{sortinithash}{J}
+    \field{title}{Debugging GPU code}
+    \verb{url}
+    \verb https://wiki.aalto.fi/download/attachments/70779066/jjulku_debugging_
+    \verb gpu_code_final.pdf?version=1&modificationDate=1357205536000&api=v2
+    \endverb
+    \field{year}{2012}
+    \field{urlday}{24}
     \field{urlmonth}{08}
     \field{urlyear}{2019}
   \endentry
@@ -292,6 +411,32 @@
     \field{urlyear}{2019}
   \endentry
 
+  \entry{Microsoft_pdb.2019}{online}{}
+    \name{author}{1}{}{%
+      {{hash=M}{%
+         family={Microsoft},
+         familyi={M\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{M1}
+    \strng{fullhash}{M1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2019}
+    \field{labeldatesource}{year}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{title}{Using automatic shader PDB resolution in PIX}
+    \verb{url}
+    \verb https://devblogs.microsoft.com/pix/using-automatic-shader-pdb-resolut
+    \verb ion-in-pix/
+    \endverb
+    \field{year}{2019}
+    \field{urlday}{23}
+    \field{urlmonth}{08}
+    \field{urlyear}{2019}
+  \endentry
+
   \entry{Nielson.1993}{book}{}
     \name{author}{1}{}{%
       {{hash=NJ}{%
@@ -352,6 +497,73 @@
     \verb https://developer.nvidia.com/tools-overview
     \endverb
     \field{urlday}{22}
+    \field{urlmonth}{08}
+    \field{urlyear}{2019}
+  \endentry
+
+  \entry{SharpShader}{online}{}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{title}{SharpShader}
+    \verb{url}
+    \verb https://github.com/Syncaidius/SharpShader
+    \endverb
+    \field{urlday}{24}
+    \field{urlmonth}{08}
+    \field{urlyear}{2019}
+  \endentry
+
+  \entry{SPIRVcross}{online}{}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{title}{SPIRV-cross}
+    \verb{url}
+    \verb https://github.com/KhronosGroup/SPIRV-Cross
+    \endverb
+    \field{urlday}{24}
+    \field{urlmonth}{08}
+    \field{urlyear}{2019}
+  \endentry
+
+  \entry{SpirvNet}{online}{}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{title}{SpirvNet}
+    \verb{url}
+    \verb https://github.com/Philip-Trettner/SpirvNet
+    \endverb
+    \field{urlday}{24}
+    \field{urlmonth}{08}
+    \field{urlyear}{2019}
+  \endentry
+
+  \entry{Turton.2017}{online}{}
+    \name{author}{1}{}{%
+      {{hash=TL}{%
+         family={Turton},
+         familyi={T\bibinitperiod},
+         given={Lawrence},
+         giveni={L\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{TL1}
+    \strng{fullhash}{TL1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2017}
+    \field{labeldatesource}{year}
+    \field{sortinit}{T}
+    \field{sortinithash}{T}
+    \field{title}{Interpreters, compilers, JIT \& AOT compilation}
+    \verb{url}
+    \verb https://medium.com/@avelx/interpreters-compilers-jit-aot-compilation-
+    \verb 753fb2f9014e
+    \endverb
+    \field{year}{2017}
+    \field{urlday}{24}
     \field{urlmonth}{08}
     \field{urlyear}{2019}
   \endentry

@@ -1,7 +1,14 @@
 %!TEX root = ../dokumentation.tex
 
 %TODO: Einleitungen überarbeiten
+
 \chapter{Contribution}\label{cha:Contribution}
+
+The proposed solution of this work is inspired by the approaches for compute shaders described in section \ref{section:computeApproaches}. The code for the shaders is written in a language which supports the different methods for debugging listed in \ref{paragraph:debuging}.
+
+To enable the functionality while debugging, the linking of the shaders and the steps in between the shaders on the graphics pipeline, usually already provided by the graphics hardware, will be simulated in the other language.
+
+To run the shader as usual on the GPU the shaders written in the debuggable language is translated to the shader language and loaded on the hardware.
 
 \paragraph{Steps for simulating the graphics pipeline}
 
