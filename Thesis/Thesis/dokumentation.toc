@@ -21,7 +21,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {2.2}Approaches for debugging compute shaders on the CPU}{5}{section.2.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.3}Translating shaders from other languages}{5}{section.2.3}
+\contentsline {section}{\numberline {2.3}Translating shaders from other languages}{6}{section.2.3}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {3}Contribution}{8}{chapter.3}
 \defcounter {refsection}{0}\relax 
