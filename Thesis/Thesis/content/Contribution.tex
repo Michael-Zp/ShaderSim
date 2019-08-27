@@ -4,12 +4,61 @@
 
 \chapter{Contribution}\label{cha:Contribution}
 
-The proposed solution of this work is inspired by the approaches for compute shaders described in section \ref{section:computeApproaches}. The code for the shaders is written in a language which supports the different methods for debugging listed in \ref{paragraph:debuging}.
+The proposed solution of this work is inspired by the approaches for compute shaders described in section \ref{section:computeApproaches}. The code for the shaders is written in a source language which supports the different methods for debugging listed in \ref{paragraph:debuging}.
+
+To run the shader as usual on the GPU the shaders written in the source language is translated to the shader language and loaded on the hardware.
 
 To enable the functionality while debugging, the linking of the shaders and the steps in between the shaders on the graphics pipeline, usually already provided by the graphics hardware, will be simulated in the other language.
 
-To run the shader as usual on the GPU the shaders written in the debuggable language is translated to the shader language and loaded on the hardware.
+\section{Steps for translating the shader code}
+\label{section:contribution_translating}
 
-\paragraph{Steps for simulating the graphics pipeline}
+In most cases the access the attributes within a shader is done by getting its location from its name.\myCite{Lighthouse3d.2013} For being able to directly access the variables, a way to translate the shader from the source language without losing the variable names is chosen. As explained in section \ref{section:translating} by directly translating the language without compiling it to inbetween stages all kinds of languages languages can be chosen as source languages and the variable names can easily be retained.
 
-\paragraph{Steps for translating the shader code}
+Shaders within the graphics pipeline have a special way of being structured so the input and output within their respective stage is flowing correctly through the shader. For that reason it is not possible to translate any source code to the shader like described for the\myCite{Campy} example in section \ref{section:computeApproaches}. For this reason the code written in the source language ment to be translated to a shader should mimic the structure the shader language provides. This means when the shader language provides certain structures for input or output or a specific point of entry into the code an equivalent for these has to be given in the written code.
+
+The translation is done by converting the source language into a syntax tree from which the syntax will be extracted in the shader language. Occurances  of variable types also have to be translated to their correct equivalent.
+
+To be able to translate to a shader that is able to run sucessfully special patterns within shader code have to be minded. If the shader needs a header like GLSL shaders, which need the version declaration on top of the shader code, this has to be added manually in the translation process. Special syntax like the accessors in GLSL defining if a variable is a uniform or an attribute and which behavior the variables have in the shader which may not exist in the source language have to be compensated for. In chapter \ref{cha:Implementation} as an example it is explained how to do this for translating C\# to GLSL by the use of C\# Attributes.
+
+There are functionalities in the shader languages which can be used but should be avoided for performance reasons. For example the use of conditionals should be avoided and solutions where you multiply the result of the code within the condition with 0 or 1 depending on a mathematical representation of the condition should be prefered.\myCite{Holden.2013} To prevent the usage of such things the code could be replaced by the clean solution while translating or these cases are deliberately not translated in the first place.
+
+\section{Steps for simulating the graphics pipeline}
+\label{section:contribution_simulating}
+
+To simulate the graphics pipeline or at least the parts of the graphics pipeline necessary to be able to run and thereby debug the shaders written in the source language on the CPU the shaders have to be written in a structure that they can be inserted and exchanged within the simulated pipeline. The simulated pipeline has to implement the steps usually running automated on the GPU inbetween the different shader stages.
+
+The first step is to determine which kinds of shaders should be able to be simulated and therefore which parts of the pipeline as described in paragraph\ref{paragraph:pipeline} have to be implemented.
+
+\paragraph{Instance of a shader within the source language}
+
+A shader in the source language should be contained within a fixed structure like a class or at least within a single file.
+As already mentioned in section\ref{section:contribution_translating} it is optimal to have the code of the shader mimic the structure of the shader in the original language. For each access point the regular shader has in the pipeline there is an equivalent in the simulation. The possibility to set variables as attributes or uniforms, the method with which the execution of the shader functionality is triggered and the option to access the outputs of the shader after it has been executed are given.
+
+For the shader to be able to function on the CPU as on the GPU the types and functionalities existing in the shader language are implemented in the source language. For example there are the multiple forms of vector and matrix types based on the same base types. Also the methods and operators desired to be used of the shader language are implemented. The differende between value based and reference based behavior in the languages has to be considered in this step.\myCite{Magyar.2017}
+
+\paragraph{Implementation of the graphics pipeline}
+
+The way the shader is accessed and managed within the pipeline  as well as the calculations in the steps between the shaders, as described in paragraph \ref{paragraph:pipeline} are implemented. The different optional steps for optimizing in between the shader stages which can be enabled or disabled within the regular graphics pipeline like clipping, culling or the optional filters in the end are implemented if their use is desired. In the following the implementation of the basic steps is described.
+
+The ordered list of the vertices as well as the attributes affiliated to them are saved in the pipeline.
+
+To be able to set and get the attribute and uniform values by its variable names as it's done for actual shaders \myCite{Lighthouse3d.2013} a way to access the variables within the shader from a string containing the variable name is implemented.
+
+To calcluate the vertex step, the vertex shader is executed for each vertex with the attribute values for the vertex being passed to the shader instance. The resulting vertex data is then gained as outputs of the shader instances.
+
+The same process is done for each of the optional shader stages after the vertex step.
+
+The perspective divida and the viewport transformation are calculated and applied to all vertices.
+
+To implement the primitive assembly the vertices are put together to groups according to the primitive type which is defined within the pipeline.
+
+A raster in the size of the resulting image is generated. within the raster for each position a fragmentlist is created. For each primitive and all positions in the raster overlaping it a fragment will be generated and saved in the corresponding fragmentlist within the raster. The attributevalues of the vertices the primitive consists of are interpolated according to the position of the resulting fragment and added to said fragment.
+
+After all fragments are generated for each of them the depth and the stencil information is saved in new rasters and the fragment shader is executed with the attribute values being passed to the shader instance. The resulting fragment data is gained as outputs of the shader instances.
+
+The color data of the fragments is finally added to a raster that can then be displayed as the renderresult.
+
+
+
+

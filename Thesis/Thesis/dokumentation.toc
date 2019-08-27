@@ -5,40 +5,46 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{\nonumberline Explanation of debugging}{1}{section*.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Problem with debugging shaders in the graphics pipeline}{2}{section*.4}
+\contentsline {paragraph}{\nonumberline Structure of the graphics pipeline}{2}{section*.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Existing approaches for compute shaders}{2}{section*.5}
+\contentsline {paragraph}{\nonumberline Problem with debugging shaders in the graphics pipeline}{4}{section*.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Objective of creating a general solution for debuging shaders in the graphics pipeline}{2}{section*.6}
+\contentsline {paragraph}{\nonumberline Existing approaches for compute shaders}{4}{section*.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {2}Related Work}{4}{chapter.2}
+\contentsline {paragraph}{\nonumberline Objective of creating a general solution for debuging shaders in the graphics pipeline}{4}{section*.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.1}Existing methods for debugging shaders in the graphics pipeline}{4}{section.2.1}
+\contentsline {chapter}{\numberline {2}Related Work}{6}{chapter.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Manual debugging}{4}{section*.7}
+\contentsline {section}{\numberline {2.1}Existing methods for debugging shaders in the graphics pipeline}{6}{section.2.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Debugging with special drivers on certain hardware}{4}{section*.8}
+\contentsline {paragraph}{\nonumberline Manual debugging}{6}{section*.10}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.2}Approaches for debugging compute shaders on the CPU}{5}{section.2.2}
+\contentsline {paragraph}{\nonumberline Debugging with special drivers on certain hardware}{6}{section*.11}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.3}Translating shaders from other languages}{6}{section.2.3}
+\contentsline {section}{\numberline {2.2}Approaches for debugging compute shaders on the CPU}{7}{section.2.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {3}Contribution}{8}{chapter.3}
+\contentsline {section}{\numberline {2.3}Translating shaders from other languages}{8}{section.2.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Steps for simulating the graphics pipeline}{8}{section*.9}
+\contentsline {chapter}{\numberline {3}Contribution}{10}{chapter.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Steps for translating the shader code}{8}{section*.10}
+\contentsline {section}{\numberline {3.1}Steps for translating the shader code}{10}{section.3.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Implementation}{9}{chapter.4}
+\contentsline {section}{\numberline {3.2}Steps for simulating the graphics pipeline}{11}{section.3.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Conclusion}{10}{chapter.5}
+\contentsline {paragraph}{\nonumberline Instance of a shader within the source language}{11}{section*.12}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline Acronyms}{i}{chapter*.11}
+\contentsline {paragraph}{\nonumberline Implementation of the graphics pipeline}{12}{section*.13}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline List of Figures}{ii}{chapter*.12}
+\contentsline {chapter}{\numberline {4}Implementation}{13}{chapter.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline List of Tables}{iii}{chapter*.13}
+\contentsline {chapter}{\numberline {5}Conclusion}{14}{chapter.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline Bibliography}{iv}{chapter*.14}
+\contentsline {chapter}{\nonumberline Acronyms}{i}{chapter*.14}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline Appendix}{vii}{chapter*.15}
+\contentsline {chapter}{\nonumberline List of Figures}{ii}{chapter*.15}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline List of Tables}{iii}{chapter*.16}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline Bibliography}{iv}{chapter*.17}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline Appendix}{vii}{chapter*.18}
