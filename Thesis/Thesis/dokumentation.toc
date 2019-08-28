@@ -33,18 +33,28 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{\nonumberline Instance of a shader within the source language}{11}{section*.12}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{\nonumberline Implementation of the graphics pipeline}{12}{section*.13}
+\contentsline {paragraph}{\nonumberline Implementation of the graphics pipeline}{11}{section*.13}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {4}Implementation}{13}{chapter.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Conclusion}{14}{chapter.5}
+\contentsline {paragraph}{\nonumberline Structure of a shader in C\#}{13}{section*.14}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline Acronyms}{i}{chapter*.14}
+\contentsline {paragraph}{\nonumberline Translation of the shader class}{14}{section*.15}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline List of Figures}{ii}{chapter*.15}
+\contentsline {paragraph}{\nonumberline Implementation of the variable types}{15}{section*.16}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline List of Tables}{iii}{chapter*.16}
+\contentsline {paragraph}{\nonumberline Simulating the pipeline}{15}{section*.17}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline Bibliography}{iv}{chapter*.17}
+\contentsline {paragraph}{\nonumberline Surrounding structure}{16}{section*.18}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\nonumberline Appendix}{vii}{chapter*.18}
+\contentsline {paragraph}{\nonumberline Used example geometry and shaders}{16}{section*.19}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {5}Conclusion}{17}{chapter.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline Acronyms}{i}{chapter*.22}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline List of Figures}{ii}{chapter*.23}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline Bibliography}{iii}{chapter*.24}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\nonumberline Appendix}{vi}{chapter*.25}

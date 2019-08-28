@@ -400,11 +400,10 @@ namespace ShaderSimulator
                                 {
                                     if (outValue.Key == FragmentShader.ColorName)
                                     {
-                                        Color color = Color.FromArgb((int)(((Vector4)outValue.Value).A * 255),
-                                            (int)(((Vector4)outValue.Value).R * 255),
-                                            (int)(((Vector4)outValue.Value).G * 255),
-                                            (int)(((Vector4)outValue.Value).B * 255));
-
+                                        Color color = Color.FromArgb(Math.Min((int)(((Vector4)outValue.Value).A * 255), 255),
+                                            Math.Min((int)(((Vector4)outValue.Value).R * 255), 255),
+                                            Math.Min((int)(((Vector4)outValue.Value).G * 255), 255),
+                                            Math.Min((int)(((Vector4)outValue.Value).B * 255), 255));
                                         bmp.SetPixel(x, y, color);
                                     }
                                 }

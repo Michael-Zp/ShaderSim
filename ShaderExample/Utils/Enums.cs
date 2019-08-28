@@ -4,7 +4,7 @@
     {
         public enum EntityType
         {
-            Triangle, Cube
+            Triangle, Tetrahedron
         }
     }
 }

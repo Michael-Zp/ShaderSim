@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using ShaderExample.Shaders;
 using ShaderExample.Utils;
@@ -9,8 +8,7 @@ using ShaderRenderer;
 using ShaderUtils;
 using ShaderSimulator;
 using ShaderTranslator;
-using Matrix4x4 = ShaderUtils.Mathematics.Matrix4x4;
-using Vector4 = ShaderUtils.Mathematics.Vector4;
+using ShaderUtils.Mathematics;
 
 namespace ShaderExample
 {
@@ -30,7 +28,7 @@ namespace ShaderExample
             _wrapper = debug ? (RenderWrapper)new RenderSimulator() : new RenderTranslator();
 
             _vertex = new LightedVertex();
-            _fragment = new PassFragment();
+            _fragment = new LightedFragment();
             if (_wrapper is RenderTranslator translator)
             {
                 string directory = Directory.GetCurrentDirectory();
@@ -41,9 +39,14 @@ namespace ShaderExample
         public void Render(IEnumerable<Entity> entities)
         {
             Dictionary<IVertexArrayObject, int> vaoInformations = PrepareVAOs(entities);
-            _camera.Position = new System.Numerics.Vector3(0.15f, 0.5f, 1f);
+            _camera.Position = new System.Numerics.Vector3(0.15f, 0.5f, 0.5f);
+            _camera.Pitch = 20;
             _wrapper.ActivateShader(_vertex, _fragment);
             _wrapper.SetUniform("Camera", (Matrix4x4)_camera.CalcMatrix());
+            _wrapper.SetUniform("CameraPosition", (Vector3)_camera.CalcPosition());
+            _wrapper.SetUniform("LightDirection", (Vector3)System.Numerics.Vector3.Normalize(new System.Numerics.Vector3(-1f, -1, -1)));
+            _wrapper.SetUniform("AmbientLightColor", new Vector4(0.1f, 0.1f, 0.1f, 1f));
+            _wrapper.SetUniform("LightColor", new Vector4(1f, 1f, 1f, 1f));
             //_wrapper.SetUniform("Camera", (Matrix4x4)System.Numerics.Matrix4x4.Transpose(System.Numerics.Matrix4x4.CreateTranslation(new System.Numerics.Vector3(0f, -0.5f, 0))));
 
             List<Texture2D> layers = new List<Texture2D>();
@@ -90,6 +93,9 @@ namespace ShaderExample
                     {
                         case Enums.EntityType.Triangle:
                             mesh = MeshCreator.CreateTriangle();
+                            break;
+                        case Enums.EntityType.Tetrahedron:
+                            mesh = MeshCreator.CreateteTrahedron();
                             break;
                     }
 

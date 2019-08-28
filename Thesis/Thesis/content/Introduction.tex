@@ -34,17 +34,17 @@ The graphics pipeline also known as rendering pipeline differentiates from frame
 
 In the first stage the vertices are specified. The vertices are set up in an ordered list. By setting a primitive type it is determined how these vertices define the boundaries of primitives. Attributes are linked to the vertices adding data to them.
 
-The second stage always is the stage where the vertex shader is executed for each defined vertex with its data. Each vertex is mapped to a specific output vertex with the output data of the vertex shader per vertex.
+The second stage is the execution of the vertex shader for each defined vertex with its data. For each vertex the vertex shader generates an output vertex with data.
 
 After the vertex stage multiple otional stages can occur. Examples for these are the Tesselation stage or the Geometry stage where additional shaders are executed to implement additional changes to the vertices or even remove or add vertices.
 
-In the following stage which can also be regarded as multiple stages there are multiple optimization steps, the primitive assembly and the rasterization. The perspective divide and the viewport transformation are calculated. Through clipping, which is optional, primitives that overlap the edge of the viewing volume are split into multiple primitives and primitives outside the viewing volume are removed. Primitives are assembled according to the primitive type, so a list of primitives is constructed out of the list of vertices where each primitive is constructed out of multiple vertices. Face culling can occur as additional optimization removing primitives that face certain directions in the window space. The primitives are then rasterized into fragments within the raster of the render result. The data values linked to the vertices are atomatically interpolated within the primitive and added to the corresponding fragments.
+In the following stage there are multiple optimization steps, the primitive assembly and the rasterization. The perspective divide and the viewport transformation are calculated. Through clipping, which is optional, primitives that overlap the edge of the viewing volume are split into multiple primitives and primitives outside the viewing volume are removed. Primitives are assembled according to the primitive type, so a list of primitives is constructed out of the list of vertices where each primitive is constructed out of multiple vertices. Face culling can occur as additional optimization removing primitives that face certain directions in the window space. The primitives are then rasterized into fragments within the raster of the render result. The data values linked to the vertices are atomatically interpolated within the primitive and added to the corresponding fragments.
 
-Within the following fragment stage the fragment shader will be executed for each single fragment generating the outputs. There is always a depth buffer and a stencil buffer as an output. Usually a color output is also defined but it is possible to execute the pipeline with a default fragment shader where only depth and stencil buffers wil be set.
+Within the following fragment stage the fragment shader will be executed for each single fragment generating the outputs. There is always a depth buffer and a stencil buffer as an output. Usually a color output is also defined within the vertex shader but it is possible to execute the pipeline without setting a fragment shader. Then a default fragment shader will run, where only depth and stencil buffers wil be set.
 
-After the fragment stage the output of the render process is calculated. For each sample there are multiple otional filters that can be activated to change which fragments are used within this stage. Examples for these filters are the scissor test where a fragment is ignored when it's pixel lies outside of the rectangle of the screen or the depth test where the fragments order is changed when it's depth fulfils specific user defined conditions compared to another fragment's depth within the same sample. After all active filters were executed the color blending happens where the color between multiple fragments within the same sample is calculated together with a specific blending operation. The final data is written to the framebuffer.
+After the fragment stage the output of the render process is calculated. For each sample there are multiple optional filters that can be activated to change which fragments are used within this stage. Examples for these filters are the scissor test where a fragment is ignored when it's pixel lies outside of the rectangle of the screen or the depth test where the fragments order is changed when it's depth fulfils specific user defined conditions compared to another fragment's depth within the same sample. After all active filters were executed the color blending happens where the color between multiple fragments within the same sample is calculated together with a specific blending operation. The final data is written to the framebuffer.
 
-The two most known uses of the graphics pipeline are within the graphics libraries OpenGL and Direct3D as shown in the figures \ref{fig:pipeline_opengl} and \ref{fig:pipeline_direct3d}
+The two most known uses of the graphics pipeline are within the graphics libraries OpenGL and Direct3D as shown in  \autoref{fig:pipeline_opengl} and \autoref{fig:pipeline_direct3d}
 
 \begin{figure}[h!]
   \centering 
@@ -65,21 +65,22 @@ The two most known uses of the graphics pipeline are within the graphics librari
 
 A shader is a program running on the GPU thereby mostly running as part of the graphics pipeline.\myCite{Khronos_shader.2019} The exception for this behavior is the compute shader which is independent from the graphics pipeline.\myCite{Khronos_compute.2019}
 
-There are ways to debug shaders on the graphics pipeline, as shown in Section \ref{section:debuggingMethods}, but there are no general solutions for aiding the user in this debugging process.\myCite{Ciardi.2015}
+There are ways to debug shaders on the graphics pipeline, as shown in \autoref{section:debuggingMethods}, but there are no general solutions for aiding the user in this debugging process.\myCite{Ciardi.2015}
 
-While most CPUs are very broad in their functionality and support debugging by itself a GPU is more specialized in the way it functions and usually does not have the option to pause the code to enable inspections at runtime and does not even have access to a console or logger to write states into.\myCite{Fox.2017} As explained in more detail in Section \ref{section:debuggingMethods_drivers} it is possible to enable debugging on the GPU with specialized drivers for specific hardware.\myCite{Nvidia_debug.2019}\myCite{Microsoft_debug.2016}
+While most CPUs are very broad in their functionality and support debugging by itself a GPU is more specialized in the way it functions and usually does not have the option to pause the code to enable inspections at runtime and does not even have access to a console or logger to write states into.\myCite{Fox.2017} As explained in more detail in \autoref{section:debuggingMethods_drivers} it is possible to enable debugging on the GPU with specialized drivers for specific hardware.\myCite{Nvidia_debug.2019}\myCite{Microsoft_debug.2016}
 
 \paragraph{Existing approaches for compute shaders}
 
 There are approaches which enable debugging of compute shader code by translating it from another language. The code is written in a language for the CPU which supports debugging with tools. It is  run and debugged on the CPU while it is translated to the shader language to run as a compute shader on the GPU.
-See more in section \ref{section:computeApproaches}.
+See more in \autoref{section:computeApproaches}.
 
 \paragraph{Objective of creating a general solution for debuging shaders in the graphics pipeline}
+\label{paragraph:objective}
 
 The objective of this work is to create a general solution to enable debugging of shaders within the graphics pipeline. The goals this solution should fulfill are the following:
 
 \begin{itemize}
-	\item The different methods shown to assist the programmer in debugging mentioned in Section \ref{paragraph:debuging} are usable.
+	\item Different methods shown to assist the programmer in debugging mentioned in \autoref{paragraph:debuging} are usable.
 	\item The solution is not dependent on using specific graphics cards or drivers.
 	\item It is possible to switch between a mode where debugging is enabled and a mode where the shaders run as usual, so the program can run with the full performance and without interference of the debugger.
 	\item The resulting output per render iteration of the debugger is close to the output of the program with the undebugged shader. It is close enough that the programmer can see what the rendering result without the debugger would look like. Errors like those resulting from the use of float variables with their inaccuracies are tolerable because there are tolerances within human perception where minimal changes in position or color within a rendered result do not matter.\myCite{Franz.2006}

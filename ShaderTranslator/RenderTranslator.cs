@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -97,6 +98,7 @@ namespace ShaderTranslator
             programText = File.ReadAllText(fragmentShaderFilePath);
             tree = CSharpSyntaxTree.ParseText(programText).WithFilePath(fragmentShaderFilePath);
             root = tree.GetCompilationUnitRoot();
+            ListMembers(root);
             string fragmentTranslation = Translate(root);
             Console.WriteLine(fragmentTranslation);
 
@@ -266,6 +268,9 @@ namespace ShaderTranslator
                     break;
                 case ParenthesizedExpressionSyntax syntax:
                     code += syntax.OpenParenToken + TranslateNode(syntax.Expression) + syntax.CloseParenToken;
+                    break;
+                case PrefixUnaryExpressionSyntax syntax:
+                    code += syntax.OperatorToken.ValueText + TranslateNode(syntax.Operand);
                     break;
                 case BinaryExpressionSyntax syntax:
                     code += TranslateNode(syntax.Left) + " " + syntax.OperatorToken + " " + TranslateNode(syntax.Right);

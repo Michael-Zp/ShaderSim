@@ -8,7 +8,7 @@ For debugging a shader program within the graphics pipeline there is the option 
 
 \paragraph{Manual debugging}
 
-The manual way of debugging a shader is by creating outputs of the values within the shader program to see anomalies in their values. This can't be done by writing these values on the console or in a log file like it would be done in a CPU based application because, as mentioned in section \ref{section:problems}, there is no access to the console or a logger within a shader program. The workaround used here is to return the values projected on the rgba-color values on the resulting image of the program. In this way the programmer can see the rough area in which the values are located on the direct output. The image can also be saved and inspected closer to get the exact values within the pixels of the resulting image.\myCite{Ciardi.2015}
+The manual way of debugging a shader is by creating outputs of the values within the shader program to see anomalies in their values. This can't be done by writing these values on the console or in a log file like it would be done in a CPU based application because, as mentioned in \autoref{section:problems}, there is no access to the console or a logger within a shader program. The workaround used here is to return the values projected on the rgba-color values on the resulting image of the program. In this way the programmer can see the rough area in which the values are located on the direct output. The image can also be saved and inspected closer to get the exact values within the pixels of the resulting image.\myCite{Ciardi.2015}
 
 \paragraph{Debugging with special drivers on certain hardware}
 \label{section:debuggingMethods_drivers}
