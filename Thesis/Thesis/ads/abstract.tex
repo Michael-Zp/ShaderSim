@@ -2,31 +2,10 @@
 
 \pagestyle{empty}
 
-\iflang{de}{%
-% Dieser deutsche Teil wird nur angezeigt, wenn die Sprache auf Deutsch eingestellt ist.
-\renewcommand{\abstractname}{\langabstract} % Text für Überschrift
-
-% \begin{otherlanguage}{english} % auskommentieren, wenn Abstract auf Deutsch sein soll
 \begin{abstract}
-Logfiles beinhalten eine große Menge an Daten, deren Analyse bei der Suche nach Fehlern und der Überwachung einer IT Infrastruktur eine große Hilfe sind. Dabei stellen sich mehrere Herausforderungen. Die Erste ist, dass Logfiles textbasiert sind. Der Nachteil hierbei ist, dass im Vergleich zu einer Datenbank oder einer XML Datei textbasierte Dateien keine klar auslesbare oder durchsuchbare Struktur besitzen. Die Zweite ist, dass Systeme so viele Informationen wie möglich loggen und dadurch die nützlichen bzw. wichtigen Informationen erst herausgefiltert werden müssen.
 
-Für die Analyse von textbasierten Daten eignet sich sehr gut das MapReduce Modell. Außerdem lässt sich das Modell sehr einfach skalieren und auf mehrere Programmläufe verteilen (Master-Worker). Das Apache Hadoop Projekt stellt sowohl für MapReduce, als auch für die Verwaltung von mehreren Programmläufen, ein Basisframework bereit, mit welchem die Entwicklung eines Analyseprogramms durchgeführt werden soll.
+Debugging is a big part of the programming process. Most programming languages are supported by different debugging tools. For writing shaders within the graphics pipeline, the existing tools and support for debugging are very scarce and most of the tools provided are limited to use with specific hardware and specific drivers for said hardware.
 
-Ziel dieser Arbeit ist die Entwicklung einer prototypischen Anwendung zur formatunabhängigen Analyse von Logfiles unter Zuhilfenahme von Apache Hadoop MapReduce.  Die Anwendung soll die bisher vorhandenen Monitoring Systeme innerhalb der Infrastruktur ergänzen, wodurch Informationen über den Zustand des Systems schneller erhoben werden können. Des Weiteren sollen aufkommende Fehler besser erkannt werden, um die Reaktionszeit auf diese zu optimieren.
-\end{abstract}
-% \end{otherlanguage} % auskommentieren, wenn Abstract auf Deutsch sein soll
-}
-
-
-
-\iflang{en}{%
-% Dieser englische Teil wird nur angezeigt, wenn die Sprache auf Englisch eingestellt ist.
-\renewcommand{\abstractname}{\langabstract} % Text für Überschrift
-
-\begin{abstract}
-Debugging is a big part of the programming process. Most programming languages are supported by different debugging tools. For writing shaders within the graphics pipeline the existing tools and support for debugging are very scarce and most of the tools provided are limited to use with specific hardware and specific drivers for said hardware.
-
-This thesis provides a solution to enable the use of different debugging tools for shaders in the graphics pipeline without the dependency on specific hardware or drivers while still providing the advantage of being executable on the GPU. To achieve this the shader will be written in a language supported by debugging tools while being executed in a simulated version of the graphics pipeline on the CPU. This shader is then translated to a regular shader language to run on the GPU.
+This thesis provides a solution to enable the use of different debugging tools for shaders in the graphics pipeline without the dependency on specific hardware or drivers while still providing the advantage of being executable on the GPU. To achieve this, the shader will be written in a language supported by debugging tools while being executed in a simulated version of the graphics pipeline on the CPU. This shader is then translated to a regular shader language to run on the GPU.
 
 \end{abstract}
-}
