@@ -13,13 +13,13 @@ To enable the functionality while debugging, the linking of the shaders and the 
 \section{Steps for translating the shader code}
 \label{section:contribution_translating}
 
-In most cases the access of attributes within a shader is done by getting its location from its name.\myCite{Lighthouse3d.2013} To directly access the variables, a way to translate the shader from the source language without losing the variable names is chosen. As explained in \autoref{section:translating} by directly translating the language without compiling it to intermediate stages all kinds of languages can be chosen as source languages and the variable names can easily be retained.
+In most cases the access of attributes within a shader is done by getting its location from its name.\myCite{Lighthouse3d.2013} To directly access the variables, a way to translate the shader from the source language keeping the variable names is chosen. As explained in \autoref{section:translating} by directly translating the language without compiling it to intermediate stages all kinds of languages can be chosen as source languages and the variable names can easily be retained.
 
-Shaders within the graphics pipeline have a special way of being structured so the input and output within their respective stage is flowing correctly through the shader. For that reason it is not possible to translate any source code to the shader like described in the\myCite{Campy} example in  \autoref{section:computeApproaches}. For this reason the code written in the source language ment to be translated to a shader should mimic the structure the shader language provides. This means when the shader language provides certain structures for input or output or a specific point of entry into the code an equivalent for these has to be given in the code written in the source language.
+Shaders within the graphics pipeline have a special way of being structured so the input and output within their respective stage is flowing correctly through the shader. For that reason it is not possible to translate any source code to the shader like described in the\myCite{Campy} example in  \autoref{section:computeApproaches}. Because of this the code written in the source language ment to be translated to a shader should mimic the structure the shader language provides. This means when the shader language provides certain structures for input or output or a specific point of entry into the code an equivalent for these has to be given in the code written in the source language.
 
 The translation is done by converting the source language into a syntax tree from which the syntax will be extracted in the shader language. Occurances of variable types also have to be translated to their correct equivalent.
 
-All special patterns within the target shader language have to be considered. It is possible that special syntax only existing in the shader language has to be emulated in some way. Examples for this are shown in \autoref{cha:Implementation} for the translation of C\# to GLSL.
+It has to be considered that syntax only existing in the shader language has to be emulated in some way. Examples for this are shown in \autoref{cha:Implementation} for the translation of C\# to GLSL.
 
 \section{Steps for simulating the graphics pipeline}
 \label{section:contribution_simulating}
@@ -46,7 +46,7 @@ The way the shader is accessed and managed within the pipeline,  as well as the 
 
 The ordered list of the vertices as well as the attributes affiliated to them are saved in the pipeline.
 
-To be able to set and get the attribute and uniform values by its variable names as it's done for actual shaders \myCite{Lighthouse3d.2013} a way to access the variables within the shader from a string containing the variable name is implemented.
+To be able to set and get the attribute and uniform values by its variable names as it's done for actual shaders  a way to access the variables within the shader from a string containing the variable name is implemented.\myCite{Lighthouse3d.2013}
 
 To calculate the vertex step, the vertex shader is executed for each vertex with the attribute values for the vertex being passed to the shader instance. The resulting vertex data is then gained as outputs of the shader instances.
 

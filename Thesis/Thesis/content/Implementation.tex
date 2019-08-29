@@ -13,14 +13,14 @@ The project is a proof of concept where a basic functionality of the vertex shad
 
 \paragraph{Structure of a shader in C\#}
 
-A shader is written as a class inheriting necessary features from a base class "Shader".
+A shader is written as a class, which inherits necessary features from a base class "Shader".
 
-The base class shader has following features:
+The base class "Shader" has following features:
 \begin{itemize}
 \item An abstract "Main" function which acts as the entry point for each shader and has to be implemented in the different shaders.
 \item an implementation of the different mathematical functions necessary for the basic examples.
-\item A method which allows to set the value of a property within the shader class by passing its name as a string and the value as a generic type. The properties are found and the value is set by accessing it via reflections. This method also gets an attribute type to be able to check if the property has a specific custom attribute attached to it. This is to be able to differentiate between a property emulating a "in" or a "uniform" variable.
-\item A method to return the names and values of all properties having a custom attribute of the type "OutAttribute" attached to them. These properties are found by using reflections.
+\item A method which allows to set the value of a property within the shader class by passing its name as a string and the value as a generic type. The properties are found and the value is set by accessing it via Reflection. This method also gets an attribute type to be able to check if the property has a specific custom attribute attached to it. This is used to differentiate between a property emulating a "in" or a "uniform" variable.
+\item A method to return the names and values of all properties having a custom attribute of the type "OutAttribute" attached to them. These properties are found by using Reflection.
 \end{itemize}
 
 To implement the different behaviors of a vertex and a fragment shader, the resulting shaders are not directly inheriting the Shader class but one of two additional abstract classes implementing the base class "Shader":
@@ -42,7 +42,7 @@ Within the C\# code the different parts can have a "TranslationAttribute" attach
 There are special patterns in the GLSL code that have no direct equivalent within C\#. The following solutions are within the project:
 \begin{itemize}
 \item Each GLSL shader has a line at the top defining its version. This line is simply added at the beginning of each translated shader and not emulated within the C\# version of the shader.
-\item each variable within a shader can have an accessor defining if it is a writable attribute, a readable attribute or a uniform variable. This behavior is mimicked by having properties in the C\# shader class that can have one of the three custom attribute classes "InAttribure", "OutAttribute" or "uniformAttribute" attached to them. This attribute is replaced by the corresponding "in", "out" or "uniform" tag when being translated to GLSL.
+\item Each variable within a shader can have an accessor defining if it is a writable attribute, a readable attribute or a uniform variable. This behavior is mimicked by having properties in the C\# shader class that can have one of the three custom attribute classes "InAttribure", "OutAttribute" or "UniformAttribute" attached to them. This attribute is replaced by the corresponding "in", "out" or "uniform" tag when being translated to GLSL.
 \end{itemize}
 
 \paragraph{Implementation of the variable types}
