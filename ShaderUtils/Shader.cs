@@ -13,16 +13,20 @@ namespace ShaderUtils
         public abstract void Main();
 
         public Dictionary<string, MethodInfo> InAttributeMethods = new Dictionary<string, MethodInfo>();
-        
+
         private Dictionary<string, PropertyInfo> _outProperties = new Dictionary<string, PropertyInfo>();
+        private Dictionary<string, PropertyInfo> _inProperties = new Dictionary<string, PropertyInfo>();
         private Dictionary<string, MethodInfo> _outValueGetMethods = null;
+
+
 
         protected Shader()
         {
             IEnumerable<PropertyInfo> properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
             _outProperties = properties.Where(property => property.GetCustomAttribute<OutAttribute>() != null).ToDictionary(property => property.Name, property => property);
-            
-            foreach(var inProperty in properties.Where(property => property.GetCustomAttribute<InAttribute>() != null))
+            _inProperties = properties.Where(property => property.GetCustomAttribute<InAttribute>() != null).ToDictionary(property => property.Name, property => property);
+
+            foreach (var inProperty in properties.Where(property => property.GetCustomAttribute<InAttribute>() != null))
             {
                 MethodInfo generic = typeof(Shader).GetMethod("SetValue").MakeGenericMethod(typeof(InAttribute), inProperty.GetValue(this).GetType());
                 InAttributeMethods.Add(inProperty.Name, generic);
@@ -54,14 +58,7 @@ namespace ShaderUtils
                 }
             }
 
-            Dictionary<string, object> ret = new Dictionary<string, object>();
-
-            foreach(var key in _outProperties.Keys)
-            {
-                ret.Add(key, _outValueGetMethods[key].Invoke(this, null));
-            }
-
-            return ret;
+            return _outValueGetMethods.ToDictionary(method => method.Key, method => _outValueGetMethods[method.Key].Invoke(this, null));
         }
 
         [Translation("max")]

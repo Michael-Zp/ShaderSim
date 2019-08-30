@@ -32,58 +32,59 @@ namespace BarycentricCudaLib
 
     public class BarycentricCuda
     {
-        static CudaContext ctx;
-        static CudaKernel baryKernel;
+        private CudaContext ctx;
+        private CudaKernel baryKernel;
+        private int Height;
+        private int Width;
+
         //static bool noprompt;
         // Variables
-        static float2 h_v0;
-        static float2 h_v1;
-        static float2 h_v2;
-        static int h_dCount;
-        static float[] h_da;
-        static float[] h_db;
-        static float[] h_dc;
-        static float[] h_dOut;
-        static int[] h_dOut_valid;
-        static int h_width;
-        static int h_height;
-
-        static CudaDeviceVariable<float2> dev_v0;
-        static CudaDeviceVariable<float2> dev_v1;
-        static CudaDeviceVariable<float2> dev_v2;
-        static CudaDeviceVariable<int> dev_dCount;
-        static CudaDeviceVariable<float> dev_da;
-        static CudaDeviceVariable<float> dev_db;
-        static CudaDeviceVariable<float> dev_dc;
-        static CudaDeviceVariable<float> dev_dOut;
-        static CudaDeviceVariable<int> dev_dOut_valid;
-        static CudaDeviceVariable<int> dev_width;
-        static CudaDeviceVariable<int> dev_height;
+        private float2 h_v0 = new float2(0, 0);
+        private float2 h_v1 = new float2(0, 0);
+        private float2 h_v2 = new float2(0, 0);
         
-        public static List<BarycentricReturn> Execute(Triangle triangle, int width, int height, out double runtime)
+
+        public BarycentricCuda(int width, int height)
         {
+            Width = width;
+            Height = height;
 
-            // Allocate input vectors in host memory
-            if(ctx == null)
+            //Init Cuda context
+            ctx = new CudaContext(CudaContext.GetMaxGflopsDeviceId());
+
+            //Load Kernel image from resources
+            string resName = "bary.ptx";
+
+            string resNamespace = "BarycentricCudaLib";
+            string resource = resNamespace + "." + resName;
+            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource);
+            if (stream == null) throw new ArgumentException("Kernel not found in resources.");
+
+            baryKernel = ctx.LoadKernelPTX(stream, "baryKernel");
+        }
+        
+        public List<List<BarycentricReturn>> ExecuteMultiple(List<Triangle> triangles, out double runtime)
+        {
+            runtime = 0;
+            
+            List<List<BarycentricReturn>> interpolated = new List<List<BarycentricReturn>>();
+
+            foreach (var triangle in triangles)
             {
-                //Init Cuda context
-                ctx = new CudaContext(CudaContext.GetMaxGflopsDeviceId());
-
-                //Load Kernel image from resources
-                string resName = "bary.ptx";
-
-                string resNamespace = "BarycentricCudaLib";
-                string resource = resNamespace + "." + resName;
-                Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource);
-                if (stream == null) throw new ArgumentException("Kernel not found in resources.");
-
-                baryKernel = ctx.LoadKernelPTX(stream, "baryKernel");
+                interpolated.Add(Execute(triangle, out double tempKernelTime));
+                runtime += tempKernelTime;
             }
+
+            return interpolated;
+        }
+
+        public List<BarycentricReturn> Execute(Triangle triangle, out double runtime)
+        {
             
             h_v0 = new float2(((Vector4)triangle[0][VertexShader.PositionName]).X, ((Vector4)triangle[0][VertexShader.PositionName]).Y);
             h_v1 = new float2(((Vector4)triangle[1][VertexShader.PositionName]).X, ((Vector4)triangle[1][VertexShader.PositionName]).Y);
             h_v2 = new float2(((Vector4)triangle[2][VertexShader.PositionName]).X, ((Vector4)triangle[2][VertexShader.PositionName]).Y);
-            h_dCount = 1;
+            int dataByteSize = 1;
             foreach(var key in triangle[0].Keys)
             {
                 if(key == VertexShader.PositionName)
@@ -95,30 +96,30 @@ namespace BarycentricCudaLib
                 {
                     case float _:
                         {
-                            h_dCount += 1;
+                            dataByteSize += 1;
                             break;
                         }
                     case Vector2 _:
                         {
-                            h_dCount += 2;
+                            dataByteSize += 2;
                             break;
                         }
                     case Vector3 _:
                         {
-                            h_dCount += 3;
+                            dataByteSize += 3;
                             break;
                         }
                     case Vector4 _:
                         {
-                            h_dCount += 4;
+                            dataByteSize += 4;
                             break;
                         }
                 }
             }
 
-            h_da = new float[h_dCount];
-            h_db = new float[h_dCount];
-            h_dc = new float[h_dCount];
+            float[] h_da = new float[dataByteSize];
+            float[] h_db = new float[dataByteSize];
+            float[] h_dc = new float[dataByteSize];
 
             h_da[0] = ((Vector4)triangle[0][VertexShader.PositionName]).Z;
             h_db[0] = ((Vector4)triangle[1][VertexShader.PositionName]).Z;
@@ -203,31 +204,24 @@ namespace BarycentricCudaLib
                 }
             }
 
-
-
-            h_dOut = new float[width * height * h_dCount];
-            h_dOut_valid = new int[width * height];
-            h_width = width;
-            h_height = height;
+            
+            float[] h_dOut = new float[Width * Height * dataByteSize];
+            int[] h_dOut_valid = new int[Width * Height];
 
             // Allocate vectors in device memory and copy vectors from host memory to device memory 
             // Notice the new syntax with implicit conversion operators: Allocation of device memory and data copy is one operation.
-            dev_v0 = h_v0;
-            dev_v1 = h_v1;
-            dev_v2 = h_v2;
-            dev_dCount = h_dCount;
-            dev_da = h_da;
-            dev_db = h_db;
-            dev_dc = h_dc;
+            CudaDeviceVariable<float2> dev_v0 = h_v0;
+            CudaDeviceVariable<float2> dev_v1 = h_v1;
+            CudaDeviceVariable<float2> dev_v2 = h_v2;
+            CudaDeviceVariable<float> dev_da = h_da;
+            CudaDeviceVariable<float> dev_db = h_db;
+            CudaDeviceVariable<float> dev_dc = h_dc;
 
-            dev_dOut = new CudaDeviceVariable<float>(width * height * h_dCount);
-            dev_dOut_valid = new CudaDeviceVariable<int>(width * height);
+            CudaDeviceVariable<float> dev_dOut = new CudaDeviceVariable<float>(Width * Height * dataByteSize);
+            CudaDeviceVariable<int> dev_dOut_valid = new CudaDeviceVariable<int>(Width * Height);
+                        
 
-            dev_width = h_width;
-            dev_height = h_height;
-            
-
-            dim3 windowSize = new dim3(width, height);
+            dim3 windowSize = new dim3(Width, Height);
             dim3 blockSize = new dim3(16, 16, 1);
             dim3 gridSize = new dim3(windowSize.x / blockSize.x + 1, windowSize.y / blockSize.y + 1);
 
@@ -240,14 +234,14 @@ namespace BarycentricCudaLib
             baryKernel.Run(dev_v0.DevicePointer, 
                            dev_v1.DevicePointer, 
                            dev_v2.DevicePointer, 
-                           dev_dCount.DevicePointer, 
+                           dataByteSize, 
                            dev_da.DevicePointer, 
                            dev_db.DevicePointer,
                            dev_dc.DevicePointer, 
                            dev_dOut.DevicePointer, 
                            dev_dOut_valid.DevicePointer,
-                           dev_width.DevicePointer, 
-                           dev_height.DevicePointer);
+                           Width, 
+                           Height);
 
 
             // Copy result from device memory to host memory
@@ -257,18 +251,42 @@ namespace BarycentricCudaLib
 
             runtime = sw.Elapsed.TotalMilliseconds;
 
-            CleanupResources();
+            //Cleanup
+            if (dev_v0 != null)
+                dev_v0.Dispose();
+
+            if (dev_v1 != null)
+                dev_v1.Dispose();
+
+            if (dev_v2 != null)
+                dev_v2.Dispose();
+
+            if (dev_da != null)
+                dev_da.Dispose();
+
+            if (dev_db != null)
+                dev_db.Dispose();
+
+            if (dev_dc != null)
+                dev_dc.Dispose();
+
+            if (dev_dOut != null)
+                dev_dOut.Dispose();
+
+            if (dev_dOut_valid != null)
+                dev_dOut_valid.Dispose();
+            
 
             List<BarycentricReturn> outData = new List<BarycentricReturn>();
-            
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    int baseIndex = y * width + x;
-                    int nextValueStep = height * width;
 
-                    if(h_dOut_valid[baseIndex] == 0)
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    int baseIndex = y * Width + x;
+                    int nextValueStep = Height * Width;
+
+                    if (h_dOut_valid[baseIndex] == 0)
                     {
                         continue;
                     }
@@ -277,8 +295,8 @@ namespace BarycentricCudaLib
                     List<object> fragmentData = new List<object>();
 
                     currentIndex = 1;
-                    
-                    foreach(var key in triangle[0].Keys)
+
+                    foreach (var key in triangle[0].Keys)
                     {
                         if (key == VertexShader.PositionName)
                         {
@@ -325,48 +343,11 @@ namespace BarycentricCudaLib
                     }
 
                     outData.Add(new BarycentricReturn(x, y, depth, fragmentData, true));
-                    
+
                 }
             }
 
             return outData;
-        }
-
-        static void CleanupResources()
-        {
-            // Free device memory
-            if (dev_v0 != null)
-                dev_v0.Dispose();
-
-            if (dev_v1 != null)
-                dev_v1.Dispose();
-
-            if (dev_v2 != null)
-                dev_v2.Dispose();
-
-            if (dev_dCount != null)
-                dev_dCount.Dispose();
-
-            if (dev_da != null)
-                dev_da.Dispose();
-
-            if (dev_db != null)
-                dev_db.Dispose();
-
-            if (dev_dc != null)
-                dev_dc.Dispose();
-
-            if (dev_dOut != null)
-                dev_dOut.Dispose();
-
-            if (dev_height != null)
-                dev_height.Dispose();
-
-            if (dev_width != null)
-                dev_width.Dispose();
-
-            // Free host memory
-            // We have a GC for that :-)
         }
     }
 }

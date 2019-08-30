@@ -15,21 +15,21 @@
 	__global__ void baryKernel(const float2 *v0, \
 		const float2 *v1, \
 		const float2 *v2, \
-		const int *dCount, \
+		const int dCount, \
 		const float *da, \
 		const float *db, \
 		const float *dc, \
 		float *dOut, \
 		int *dOut_valid, \
-		const int *width, \
-		const int *height)
+		const int width, \
+		const int height)
 	{
 		unsigned int x = blockIdx.x * blockDim.x + threadIdx.x;
 		unsigned int y = blockIdx.y * blockDim.y + threadIdx.y;
 
-		if (x < *width && y < *height)
+		if (x < width && y < height)
 		{
-			float2 pos = calculatePosition(x, y, *width, *height);
+			float2 pos = calculatePosition(x, y, width, height);
 			float2 t0 = make_float2(v2->x, v2->y);
 			float2 t1 = make_float2(v0->x, v0->y);
 			float2 t2 = make_float2(v1->x, v1->y);
@@ -51,16 +51,16 @@
 
 			if (baryX > 0 && baryY > 0 && baryZ > 0)
 			{
-				for (int i = 0; i < *dCount; i++)
+				for (int i = 0; i < dCount; i++)
 				{
-					dOut[y * *width + x + i * (*width * *height)] = da[i] * baryX + db[i] * baryY + dc[i] * baryZ;
+					dOut[y * width + x + i * (width * height)] = da[i] * baryX + db[i] * baryY + dc[i] * baryZ;
 				}
-				dOut_valid[y * *width + x] = 1;
+				dOut_valid[y * width + x] = 1;
 			}
 			else
 			{
-				dOut[y * *width + x] = 0;
-				dOut_valid[y * *width + x] = 0;
+				dOut[y * width + x] = 0;
+				dOut_valid[y * width + x] = 0;
 			}
 		}
 

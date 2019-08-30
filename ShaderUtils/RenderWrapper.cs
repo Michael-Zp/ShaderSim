@@ -19,6 +19,12 @@ namespace ShaderUtils
             Width = width;
             Height = height;
             Bmp = new Bitmap(Width, Height);
+            OnResize(width, height);
+        }
+
+        public virtual void OnResize(int width, int height)
+        {
+
         }
 
         public abstract void SetUniform<T>(string name, T value) where T : struct;

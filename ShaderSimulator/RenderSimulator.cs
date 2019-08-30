@@ -36,6 +36,7 @@ namespace ShaderSimulator
         private List<float>[,] _depths;
         private Dictionary<string, IList>[,] _fragments;
         private int[,] _fragmentCount;
+        private BarycentricCuda barycentricCuda;
 
 
         public RenderSimulator()
@@ -51,6 +52,11 @@ namespace ShaderSimulator
             _vertexPositions = new List<Vector4>();
             _vertexValues = new Dictionary<string, IList>();
             _primitives = new List<Triangle>();
+        }
+
+        public override void OnResize(int width, int height)
+        {
+            barycentricCuda = new BarycentricCuda(width, height);
         }
 
         public override void ActivateShader(VertexShader vertex, FragmentShader fragment)
@@ -145,27 +151,27 @@ namespace ShaderSimulator
             stopwatch.Start();
 
             SetUniforms();
-            Console.WriteLine($"SetUniforms Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"SetUniforms Time: \t\tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
             stopwatch.Restart();
 
             CalculateVertexStep(instanceCount);
-            Console.WriteLine($"CalculateVertexStep Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"CalculateVertexStep Time: \tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
             stopwatch.Restart();
 
             GeneratePrimitives();
-            Console.WriteLine($"GeneratePrimitives Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"GeneratePrimitives Time: \tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
             stopwatch.Restart();
 
             CalculateFragments();
-            Console.WriteLine($"CalculateFragments Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"CalculateFragments Time: \tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
             stopwatch.Restart();
 
             RenderResult = CalculateFragmentStep();
-            Console.WriteLine($"RenderResult Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"RenderResult Time: \t\tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
             stopwatch.Restart();
 
             stopwatch.Stop();
-            Console.WriteLine($"Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            Console.WriteLine($"Time: \t\t\t\tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
 
             Console.WriteLine("");
             Console.WriteLine("#########################");
@@ -264,21 +270,10 @@ namespace ShaderSimulator
             _fragmentCount = new int[Width, Height];
 
             List<List<BarycentricReturn>> interpolated = new List<List<BarycentricReturn>>();
-
-            double totalOnlyKernelTime = 0;
-            double tempKernelTime = 0;
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            foreach (var primitive in _primitives)
-            {
-                interpolated.Add(BarycentricCuda.Execute(primitive, Width, Height, out tempKernelTime));
-                totalOnlyKernelTime += tempKernelTime;
-            }
-
+            
+            interpolated = barycentricCuda.ExecuteMultiple(_primitives, out double totalOnlyKernelTime);
+            
             Console.WriteLine("Cuda Kernel Time: " + totalOnlyKernelTime);
-            Console.WriteLine("Cuda Method Time: " + sw.Elapsed.TotalMilliseconds);
 
             foreach (var inter in interpolated)
             {
@@ -381,6 +376,7 @@ namespace ShaderSimulator
                                     }
                                 }
                             }
+
                             if (closest)
                             {
                                 foreach (var key in _fragments[x, y].Keys)
@@ -390,7 +386,6 @@ namespace ShaderSimulator
                                     var value = _fragments[x, y][key][i];
                                     prop.SetValue(_activeFragmentShader, value);
                                 }
-
 
                                 _activeFragmentShader.Main();
                                 foreach (var outValue in _activeFragmentShader.GetOutValues())
