@@ -14,12 +14,16 @@ namespace BarycentricCudaLib
 {
     public struct BarycentricReturn
     {
+        public readonly int X;
+        public readonly int Y;
         public readonly float Depth;
         public readonly List<object> FragmentData;
         public readonly bool Valid;
 
-        public BarycentricReturn(float depth, List<object> fragmentData, bool valid)
+        public BarycentricReturn(int x, int y, float depth, List<object> fragmentData, bool valid)
         {
+            X = x;
+            Y = y;
             Depth = depth;
             FragmentData = fragmentData;
             Valid = valid;
@@ -56,7 +60,7 @@ namespace BarycentricCudaLib
         static CudaDeviceVariable<int> dev_width;
         static CudaDeviceVariable<int> dev_height;
         
-        public static BarycentricReturn[,] Execute(Triangle triangle, int width, int height)
+        public static List<BarycentricReturn> Execute(Triangle triangle, int width, int height, out double runtime)
         {
 
             // Allocate input vectors in host memory
@@ -230,8 +234,8 @@ namespace BarycentricCudaLib
             baryKernel.BlockDimensions = blockSize;
             baryKernel.GridDimensions = gridSize;
 
-            //Stopwatch sw = new Stopwatch();
-            //sw.Start();
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
 
             baryKernel.Run(dev_v0.DevicePointer, 
                            dev_v1.DevicePointer, 
@@ -251,16 +255,14 @@ namespace BarycentricCudaLib
             h_dOut = dev_dOut;
             h_dOut_valid = dev_dOut_valid;
 
-            //Console.WriteLine("Only cuda kernel: " + sw.Elapsed.TotalMilliseconds);
+            runtime = sw.Elapsed.TotalMilliseconds;
 
             CleanupResources();
 
-            BarycentricReturn[,] outData = new BarycentricReturn[width, height];
-
-            //Console.Write("{\n");
+            List<BarycentricReturn> outData = new List<BarycentricReturn>();
+            
             for (int x = 0; x < width; x++)
             {
-                //Console.Write("  {");
                 for (int y = 0; y < height; y++)
                 {
                     int baseIndex = y * width + x;
@@ -268,7 +270,6 @@ namespace BarycentricCudaLib
 
                     if(h_dOut_valid[baseIndex] == 0)
                     {
-                        outData[x, y] = new BarycentricReturn(0, null, false);
                         continue;
                     }
 
@@ -323,20 +324,10 @@ namespace BarycentricCudaLib
                         }
                     }
 
-                    outData[x, y] = new BarycentricReturn(depth, fragmentData, true);
-
-                    //for (int k = 0; k < h_dCount; k++)
-                    //{
-
-                    //    Console.Write("{0:N2};", h_dOut[y + x * height + k * (width * height)]);
-                    //}
-                    //Console.Write(" | ");
+                    outData.Add(new BarycentricReturn(x, y, depth, fragmentData, true));
+                    
                 }
-                //Console.Write("}\n");
             }
-            //Console.Write("}\n");
-
-            //Console.ReadKey();
 
             return outData;
         }

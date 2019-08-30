@@ -11,19 +11,21 @@ namespace ShaderUtils
     {
         [Translation("main")]
         public abstract void Main();
+
+        public Dictionary<string, MethodInfo> InAttributeMethods = new Dictionary<string, MethodInfo>();
         
-        private Dictionary<string, PropertyInfo> outProperties = new Dictionary<string, PropertyInfo>();
-        public Dictionary<string, MethodInfo> inAttributeMethods = new Dictionary<string, MethodInfo>();
+        private Dictionary<string, PropertyInfo> _outProperties = new Dictionary<string, PropertyInfo>();
+        private Dictionary<string, MethodInfo> _outValueGetMethods = null;
 
         protected Shader()
         {
             IEnumerable<PropertyInfo> properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            outProperties = properties.Where(property => property.GetCustomAttribute<OutAttribute>() != null).ToDictionary(property => property.Name, property => property);
+            _outProperties = properties.Where(property => property.GetCustomAttribute<OutAttribute>() != null).ToDictionary(property => property.Name, property => property);
             
             foreach(var inProperty in properties.Where(property => property.GetCustomAttribute<InAttribute>() != null))
             {
                 MethodInfo generic = typeof(Shader).GetMethod("SetValue").MakeGenericMethod(typeof(InAttribute), inProperty.GetValue(this).GetType());
-                inAttributeMethods.Add(inProperty.Name, generic);
+                InAttributeMethods.Add(inProperty.Name, generic);
             }
         }
 
@@ -40,13 +42,23 @@ namespace ShaderUtils
             }
         }
 
+
         public IEnumerable<KeyValuePair<string, object>> GetOutValues()
         {
+            if(_outValueGetMethods == null)
+            {
+                _outValueGetMethods = new Dictionary<string, MethodInfo>();
+                foreach (var key in _outProperties.Keys)
+                {
+                    _outValueGetMethods.Add(key, _outProperties[key].GetGetMethod());
+                }
+            }
+
             Dictionary<string, object> ret = new Dictionary<string, object>();
 
-            foreach(var key in outProperties.Keys)
+            foreach(var key in _outProperties.Keys)
             {
-                ret.Add(key, outProperties[key].GetValue(this));
+                ret.Add(key, _outValueGetMethods[key].Invoke(this, null));
             }
 
             return ret;

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using BarycentricCudaLib;
 using ShaderUtils;
 using ShaderUtils.Attributes;
@@ -34,7 +35,8 @@ namespace ShaderSimulator
         private readonly List<Triangle> _primitives;
         private List<float>[,] _depths;
         private Dictionary<string, IList>[,] _fragments;
-        
+        private int[,] _fragmentCount;
+
 
         public RenderSimulator()
         {
@@ -233,7 +235,7 @@ namespace ShaderSimulator
 
         private void SetAttribute(Shader shader, string name, object value)
         {
-            shader.inAttributeMethods[name].Invoke(shader, new object[] { name, value });
+            shader.InAttributeMethods[name].Invoke(shader, new object[] { name, value });
         }
 
         private void GeneratePrimitives()
@@ -259,88 +261,103 @@ namespace ShaderSimulator
 
             _depths = new List<float>[Width, Height];
             _fragments = new Dictionary<string, IList>[Width, Height];
-            
-            List<BarycentricReturn[,]> interpolated = new List<BarycentricReturn[,]>();
+            _fragmentCount = new int[Width, Height];
 
-            
+            List<List<BarycentricReturn>> interpolated = new List<List<BarycentricReturn>>();
+
+            double totalOnlyKernelTime = 0;
+            double tempKernelTime = 0;
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             foreach (var primitive in _primitives)
             {
-                interpolated.Add(BarycentricCuda.Execute(primitive, Width, Height));
+                interpolated.Add(BarycentricCuda.Execute(primitive, Width, Height, out tempKernelTime));
+                totalOnlyKernelTime += tempKernelTime;
             }
 
-            for (int i = 0; i < interpolated.Count; i++)
-            { 
-                for (int x = 0; x < Width; x++)
+            Console.WriteLine("Cuda Kernel Time: " + totalOnlyKernelTime);
+            Console.WriteLine("Cuda Method Time: " + sw.Elapsed.TotalMilliseconds);
+
+            foreach (var inter in interpolated)
+            {
+                foreach (var item in inter)
                 {
-                    for (int y = 0; y < Height; y++)
+                    if (_depths[item.X, item.Y] == null)
                     {
-                        if(!interpolated[i][x, y].Valid)
+                        _depths[item.X, item.Y] = new List<float>();
+                        _fragments[item.X, item.Y] = new Dictionary<string, IList>();
+                        _fragmentCount[item.X, item.Y] = 0;
+                    }
+
+                    _depths[item.X, item.Y].Add(item.Depth);
+                    _fragmentCount[item.X, item.Y]++;
+
+                    int currentIndex = 0;
+
+                    foreach (var key in _primitives[0][0].Keys)
+                    {
+                        if (key == VertexShader.PositionName)
                         {
                             continue;
                         }
 
-                        if(_depths[x, y] == null)
+                        if (!_fragments[item.X, item.Y].ContainsKey(key))
                         {
-                            _depths[x, y] = new List<float>();
-                            _fragments[x, y] = new Dictionary<string, IList>();
+                            _fragments[item.X, item.Y].Add(key, new List<object>());
                         }
 
-                        _depths[x, y].Add(interpolated[i][x, y].Depth);
-
-                        int currentIndex = 0;
-
-                        foreach (var key in _primitives[i][0].Keys)
+                        switch (_primitives[0][0][key])
                         {
-                            if(key == VertexShader.PositionName)
-                            {
-                                continue;
-                            }
-
-                            if (!_fragments[x, y].ContainsKey(key))
-                            {
-                                _fragments[x, y].Add(key, new List<object>());
-                            }
-
-                            switch (_primitives[i][0][key])
-                            {
-                                case float _:
-                                    {
-                                        _fragments[x, y][key].Add((float)interpolated[i][x, y].FragmentData[currentIndex]);
-                                        break;
-                                    }
-                                case Vector2 _:
-                                    {
-                                        _fragments[x, y][key].Add((Vector2)interpolated[i][x, y].FragmentData[currentIndex]);
-                                        break;
-                                    }
-                                case Vector3 _:
-                                    {
-                                        _fragments[x, y][key].Add((Vector3)interpolated[i][x, y].FragmentData[currentIndex]);
-                                        break;
-                                    }
-                                case Vector4 _:
-                                    {
-                                        _fragments[x, y][key].Add((Vector4)interpolated[i][x, y].FragmentData[currentIndex]);
-                                        break;
-                                    }
-                            }
-                            currentIndex++;
+                            case float _:
+                                {
+                                    _fragments[item.X, item.Y][key].Add((float)item.FragmentData[currentIndex]);
+                                    break;
+                                }
+                            case Vector2 _:
+                                {
+                                    _fragments[item.X, item.Y][key].Add((Vector2)item.FragmentData[currentIndex]);
+                                    break;
+                                }
+                            case Vector3 _:
+                                {
+                                    _fragments[item.X, item.Y][key].Add((Vector3)item.FragmentData[currentIndex]);
+                                    break;
+                                }
+                            case Vector4 _:
+                                {
+                                    _fragments[item.X, item.Y][key].Add((Vector4)item.FragmentData[currentIndex]);
+                                    break;
+                                }
                         }
+                        currentIndex++;
                     }
                 }
             }
         }
 
+        [StructLayout(LayoutKind.Explicit)]
+        struct Vector4ToInt
+        {
+            [FieldOffset(0)] public int ColorValue;
+            [FieldOffset(0)] public byte valueB;
+            [FieldOffset(1)] public byte valueG;
+            [FieldOffset(2)] public byte valueR;
+            [FieldOffset(3)] public byte valueA;
+        }
 
         private Bitmap CalculateFragmentStep()
         {
+            int[] imageData = new int[_fragments.GetLength(0) * _fragments.GetLength(1)];
+            Vector4ToInt vec4ToInt = new Vector4ToInt();
             for (int x = 0; x < _fragments.GetLength(0); x++)
             {
                 for (int y = 0; y < _fragments.GetLength(1); y++)
                 {
                     if (_fragments[x, y] != null)
                     {
-                        for (int i = 0; i < _fragments[x, y].Values.First().Count; i++)
+                        for (int i = 0; i < _fragmentCount[x, y]; i++)
                         {
 
                             bool closest = true;
@@ -359,6 +376,7 @@ namespace ShaderSimulator
                                         if (_depths[x, y][i] > _depths[x, y][j])
                                         {
                                             closest = false;
+                                            break;
                                         }
                                     }
                                 }
@@ -367,7 +385,10 @@ namespace ShaderSimulator
                             {
                                 foreach (var key in _fragments[x, y].Keys)
                                 {
-                                    _activeFragmentShader.GetType().GetProperty(key).SetValue(_activeFragmentShader, _fragments[x, y][key][i]);
+                                    var type = _activeFragmentShader.GetType();
+                                    var prop = type.GetProperty(key);
+                                    var value = _fragments[x, y][key][i];
+                                    prop.SetValue(_activeFragmentShader, value);
                                 }
 
 
@@ -376,24 +397,21 @@ namespace ShaderSimulator
                                 {
                                     if (outValue.Key == FragmentShader.ColorName)
                                     {
-                                        Color color = Color.FromArgb(Math.Min((int)(((Vector4)outValue.Value).A * 255), 255),
-                                            Math.Min((int)(((Vector4)outValue.Value).R * 255), 255),
-                                            Math.Min((int)(((Vector4)outValue.Value).G * 255), 255),
-                                            Math.Min((int)(((Vector4)outValue.Value).B * 255), 255));
-                                        Bmp.SetPixel(x, y, color);
+                                        vec4ToInt.ColorValue = 0;
+                                        vec4ToInt.valueA = (byte)Math.Min((int)(((Vector4)outValue.Value).A * 255), 255);
+                                        vec4ToInt.valueR = (byte)Math.Min((int)(((Vector4)outValue.Value).R * 255), 255);
+                                        vec4ToInt.valueG = (byte)Math.Min((int)(((Vector4)outValue.Value).G * 255), 255);
+                                        vec4ToInt.valueB = (byte)Math.Min((int)(((Vector4)outValue.Value).B * 255), 255);
+                                        imageData[x + y * Width] = vec4ToInt.ColorValue;
                                     }
                                 }
                             }
                         }
                     }
-                    else
-                    {
-                        Bmp.SetPixel(x, y, Color.Transparent);
-                    }
                 }
-        }
+            }
 
-            return Bmp;
+            return new Bitmap(Width, Height, Width, System.Drawing.Imaging.PixelFormat.Format32bppArgb, Marshal.UnsafeAddrOfPinnedArrayElement(imageData, 0));
         }
     }
 }
