@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace ShaderUtils
 {
@@ -11,11 +12,13 @@ namespace ShaderUtils
 
         protected int Width;
         protected int Height;
+        protected Bitmap Bmp;
 
         public void SetRenderSize(int width, int height)
         {
             Width = width;
             Height = height;
+            Bmp = new Bitmap(Width, Height);
         }
 
         public abstract void SetUniform<T>(string name, T value) where T : struct;

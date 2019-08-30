@@ -5,7 +5,7 @@ using ShaderUtils.Mathematics;
 
 namespace ShaderSimulator
 {
-    class Triangle
+    public class Triangle
     {
         private readonly Dictionary<string, object>[] _vertices;
         public Dictionary<string, object> this[int index] => _vertices[index];

@@ -11,23 +11,45 @@ namespace ShaderUtils
     {
         [Translation("main")]
         public abstract void Main();
+        
+        private Dictionary<string, PropertyInfo> outProperties = new Dictionary<string, PropertyInfo>();
+        public Dictionary<string, MethodInfo> inAttributeMethods = new Dictionary<string, MethodInfo>();
+
+        protected Shader()
+        {
+            IEnumerable<PropertyInfo> properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            outProperties = properties.Where(property => property.GetCustomAttribute<OutAttribute>() != null).ToDictionary(property => property.Name, property => property);
+            
+            foreach(var inProperty in properties.Where(property => property.GetCustomAttribute<InAttribute>() != null))
+            {
+                MethodInfo generic = typeof(Shader).GetMethod("SetValue").MakeGenericMethod(typeof(InAttribute), inProperty.GetValue(this).GetType());
+                inAttributeMethods.Add(inProperty.Name, generic);
+            }
+        }
 
         public void SetValue<TAttribute, TValue>(string name, TValue value) where TAttribute : Attribute where TValue : struct
         {
-            if (GetType().GetProperty(name) != null)
+            PropertyInfo info = GetType().GetProperty(name);
+
+            if (info != null)
             {
-                if (GetType().GetProperty(name).GetCustomAttribute<TAttribute>() != null)
+                if (info.GetCustomAttribute<TAttribute>() != null)
                 {
-                    GetType().GetProperty(name)?.SetValue(this, value);
+                    info?.SetValue(this, value);
                 }
             }
         }
 
         public IEnumerable<KeyValuePair<string, object>> GetOutValues()
         {
-            IEnumerable<PropertyInfo> properties = GetType().GetProperties();
+            Dictionary<string, object> ret = new Dictionary<string, object>();
 
-            return properties.Where(property => property.GetCustomAttribute<OutAttribute>() != null).ToDictionary(property => property.Name, property => property.GetValue(this));
+            foreach(var key in outProperties.Keys)
+            {
+                ret.Add(key, outProperties[key].GetValue(this));
+            }
+
+            return ret;
         }
 
         [Translation("max")]

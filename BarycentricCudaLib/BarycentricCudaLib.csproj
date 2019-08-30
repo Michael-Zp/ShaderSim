@@ -4,17 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{21663E37-0645-4761-87C5-D8D9572D7E8D}</ProjectGuid>
+    <ProjectGuid>{324424DC-70CA-4FBC-9C78-C470DDE5E9DF}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>ShaderSimulator</RootNamespace>
-    <AssemblyName>ShaderSimulator</AssemblyName>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BarycentricCudaLib</RootNamespace>
+    <AssemblyName>BarycentricCudaLib</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +24,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,17 +31,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BarycentricCudaLib">
-      <HintPath>..\BarycentricCudaLib\bin\Debug\BarycentricCudaLib.dll</HintPath>
+    <Reference Include="CudaDNN, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\ManagedCuda-CudaDNN.8.0.22\lib\net46\CudaDNN.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedCuda, Version=8.0.22.0, Culture=neutral, PublicKeyToken=242d898828717aa0, processorArchitecture=MSIL">
+      <HintPath>..\packages\ManagedCuda-80.8.0.22\lib\net46\ManagedCuda.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,15 +48,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BarycentricCuda.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RenderSimulator.cs" />
-    <Compile Include="SimulatorVAO.cs" />
-    <Compile Include="Triangle.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="bary.cu" />
+    <EmbeddedResource Include="bary.ptx" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ShaderSimulator\ShaderSimulator.csproj">
+      <Project>{21663e37-0645-4761-87c5-d8d9572d7e8d}</Project>
+      <Name>ShaderSimulator</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ShaderUtils\ShaderUtils.csproj">
       <Project>{316d3ef3-7986-4c7b-8705-4ce14c743607}</Project>
       <Name>ShaderUtils</Name>

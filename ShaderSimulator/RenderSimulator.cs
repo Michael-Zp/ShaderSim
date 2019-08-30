@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using BarycentricCudaLib;
 using ShaderUtils;
 using ShaderUtils.Attributes;
 using ShaderUtils.Mathematics;
@@ -33,6 +34,7 @@ namespace ShaderSimulator
         private readonly List<Triangle> _primitives;
         private List<float>[,] _depths;
         private Dictionary<string, IList>[,] _fragments;
+        
 
         public RenderSimulator()
         {
@@ -141,13 +143,31 @@ namespace ShaderSimulator
             stopwatch.Start();
 
             SetUniforms();
+            Console.WriteLine($"SetUniforms Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            stopwatch.Restart();
+
             CalculateVertexStep(instanceCount);
+            Console.WriteLine($"CalculateVertexStep Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            stopwatch.Restart();
+
             GeneratePrimitives();
+            Console.WriteLine($"GeneratePrimitives Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            stopwatch.Restart();
+
             CalculateFragments();
+            Console.WriteLine($"CalculateFragments Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            stopwatch.Restart();
+
             RenderResult = CalculateFragmentStep();
+            Console.WriteLine($"RenderResult Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            stopwatch.Restart();
 
             stopwatch.Stop();
             Console.WriteLine($"Time: Ticks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+
+            Console.WriteLine("");
+            Console.WriteLine("#########################");
+            Console.WriteLine("");
 
             Attributes.Clear();
             InstancedAttributes.Clear();
@@ -213,8 +233,7 @@ namespace ShaderSimulator
 
         private void SetAttribute(Shader shader, string name, object value)
         {
-            MethodInfo generic = _setValueMethod.MakeGenericMethod(typeof(InAttribute), value.GetType());
-            generic.Invoke(shader, new object[] { name, value });
+            shader.inAttributeMethods[name].Invoke(shader, new object[] { name, value });
         }
 
         private void GeneratePrimitives()
@@ -236,134 +255,89 @@ namespace ShaderSimulator
 
         private void CalculateFragments()
         {
-            Vector2[,] positions = new Vector2[Width, Height];
+            //Vector2[,] positions = new Vector2[Width, Height];
 
             _depths = new List<float>[Width, Height];
             _fragments = new Dictionary<string, IList>[Width, Height];
+            
+            List<BarycentricReturn[,]> interpolated = new List<BarycentricReturn[,]>();
 
-            for (int x = 0; x < Width; x++)
+            
+            foreach (var primitive in _primitives)
             {
-                for (int y = 0; y < Height; y++)
+                interpolated.Add(BarycentricCuda.Execute(primitive, Width, Height));
+            }
+
+            for (int i = 0; i < interpolated.Count; i++)
+            { 
+                for (int x = 0; x < Width; x++)
                 {
-                    positions[x, y] = CalculatePosition(x, y);
-                    foreach (var primitive in _primitives)
+                    for (int y = 0; y < Height; y++)
                     {
-                        Vector3 baricentric = Barycentric(positions[x, y], primitive);
-                        if (baricentric.X >= 0 && baricentric.Y >= 0 && baricentric.Z >= 0)
+                        if(!interpolated[i][x, y].Valid)
                         {
-                            if (_depths[x, y] == null)
+                            continue;
+                        }
+
+                        if(_depths[x, y] == null)
+                        {
+                            _depths[x, y] = new List<float>();
+                            _fragments[x, y] = new Dictionary<string, IList>();
+                        }
+
+                        _depths[x, y].Add(interpolated[i][x, y].Depth);
+
+                        int currentIndex = 0;
+
+                        foreach (var key in _primitives[i][0].Keys)
+                        {
+                            if(key == VertexShader.PositionName)
                             {
-                                _depths[x, y] = new List<float>();
+                                continue;
                             }
 
-                            _depths[x, y].Add(((Vector4)primitive[0][VertexShader.PositionName]).Z * baricentric.X +
-                                            ((Vector4)primitive[1][VertexShader.PositionName]).Z * baricentric.Y +
-                                            ((Vector4)primitive[2][VertexShader.PositionName]).Z * baricentric.Z);
-
-                            if (_fragments[x, y] == null)
+                            if (!_fragments[x, y].ContainsKey(key))
                             {
-                                _fragments[x, y] = new Dictionary<string, IList>();
+                                _fragments[x, y].Add(key, new List<object>());
                             }
-                            foreach (var key in _vertexValues.Keys)
-                            {
-                                if (!_fragments[x, y].ContainsKey(key))
-                                {
-                                    _fragments[x, y].Add(key, new List<object>());
-                                }
 
-                                switch (primitive[0][key])
-                                {
-                                    case float _:
-                                        {
-                                            var p0 = (float)primitive[0][key] * baricentric.X;
-                                            var p1 = (float)primitive[1][key] * baricentric.Y;
-                                            var p2 = (float)primitive[2][key] * baricentric.Z;
-                                            _fragments[x, y][key].Add(p0 + p1 + p2);
-                                            break;
-                                        }
-                                    case Vector2 _:
-                                        {
-                                            var p0 = (Vector2)primitive[0][key] * baricentric.X;
-                                            var p1 = (Vector2)primitive[1][key] * baricentric.Y;
-                                            var p2 = (Vector2)primitive[2][key] * baricentric.Z;
-                                            _fragments[x, y][key].Add(p0 + p1 + p2);
-                                            break;
-                                        }
-                                    case Vector3 _:
-                                        {
-                                            var p0 = (Vector3)primitive[0][key] * baricentric.X;
-                                            var p1 = (Vector3)primitive[1][key] * baricentric.Y;
-                                            var p2 = (Vector3)primitive[2][key] * baricentric.Z;
-                                            _fragments[x, y][key].Add(p0 + p1 + p2);
-                                            break;
-                                        }
-                                    case Vector4 _:
-                                        {
-                                            var p0 = (Vector4)primitive[0][key] * baricentric.X;
-                                            var p1 = (Vector4)primitive[1][key] * baricentric.Y;
-                                            var p2 = (Vector4)primitive[2][key] * baricentric.Z;
-                                            _fragments[x, y][key].Add(p0 + p1 + p2);
-                                            break;
-                                        }
-                                    default:
-                                        {
-                                            MethodInfo mult = primitive[0][key].GetType().GetMethod("op_Multiply", new Type[] { primitive[0][key].GetType(), typeof(float) });
-                                            MethodInfo add = primitive[0][key].GetType().GetMethod("op_Addition", new Type[] { primitive[0][key].GetType(), primitive[0][key].GetType() });
-                                            var value0 = mult.Invoke(primitive[0][key], new object[] { primitive[0][key], baricentric.X });
-                                            var value1 = mult.Invoke(primitive[1][key], new object[] { primitive[1][key], baricentric.Y });
-                                            var value2 = mult.Invoke(primitive[2][key], new object[] { primitive[2][key], baricentric.Z });
-                                            var add1 = add.Invoke(value0, new object[] { value0, value1 });
-                                            var add2 = add.Invoke(add1, new object[] { add1, value2 });
-                                            _fragments[x, y][key].Add(add2);
-                                            break;
-                                        }
-                                }
+                            switch (_primitives[i][0][key])
+                            {
+                                case float _:
+                                    {
+                                        _fragments[x, y][key].Add((float)interpolated[i][x, y].FragmentData[currentIndex]);
+                                        break;
+                                    }
+                                case Vector2 _:
+                                    {
+                                        _fragments[x, y][key].Add((Vector2)interpolated[i][x, y].FragmentData[currentIndex]);
+                                        break;
+                                    }
+                                case Vector3 _:
+                                    {
+                                        _fragments[x, y][key].Add((Vector3)interpolated[i][x, y].FragmentData[currentIndex]);
+                                        break;
+                                    }
+                                case Vector4 _:
+                                    {
+                                        _fragments[x, y][key].Add((Vector4)interpolated[i][x, y].FragmentData[currentIndex]);
+                                        break;
+                                    }
                             }
+                            currentIndex++;
                         }
                     }
                 }
             }
         }
 
-        private Vector2 CalculatePosition(int x, int y)
-        {
-            Vector2 fragSize = new Vector2(2f / Width, 2f / Height);
-
-            return new Vector2(fragSize.X * x + fragSize.X / 2 - 1, fragSize.Y * y + fragSize.Y / 2 - 1);
-        }
-
-        private Vector3 Barycentric(System.Numerics.Vector2 pos, Triangle triangle)
-        {
-            System.Numerics.Vector2 t0 = new System.Numerics.Vector2(((Vector4)triangle[0][VertexShader.PositionName]).X, ((Vector4)triangle[0][VertexShader.PositionName]).Y);
-            System.Numerics.Vector2 t1 = new System.Numerics.Vector2(((Vector4)triangle[1][VertexShader.PositionName]).X, ((Vector4)triangle[1][VertexShader.PositionName]).Y);
-            System.Numerics.Vector2 t2 = new System.Numerics.Vector2(((Vector4)triangle[2][VertexShader.PositionName]).X, ((Vector4)triangle[2][VertexShader.PositionName]).Y);
-
-            System.Numerics.Vector2 v0 = t1 - t0;
-            System.Numerics.Vector2 v1 = t2 - t0;
-            System.Numerics.Vector2 v2 = pos - t0;
-
-            float d00 = System.Numerics.Vector2.Dot(v0, v0);
-            float d01 = System.Numerics.Vector2.Dot(v0, v1);
-            float d11 = System.Numerics.Vector2.Dot(v1, v1);
-            float d20 = System.Numerics.Vector2.Dot(v2, v0);
-            float d21 = System.Numerics.Vector2.Dot(v2, v1);
-            float denom = d00 * d11 - d01 * d01;
-
-            float v = (d11 * d20 - d01 * d21) / denom;
-            float w = (d00 * d21 - d01 * d20) / denom;
-            float u = 1 - v - w;
-
-            return new Vector3(u, v, w);
-        }
 
         private Bitmap CalculateFragmentStep()
         {
-            Bitmap bmp = new Bitmap(_fragments.GetLength(0), _fragments.GetLength(1));
             for (int x = 0; x < _fragments.GetLength(0); x++)
             {
                 for (int y = 0; y < _fragments.GetLength(1); y++)
                 {
-                    bmp.SetPixel(x, y, Color.Transparent);
                     if (_fragments[x, y] != null)
                     {
                         for (int i = 0; i < _fragments[x, y].Values.First().Count; i++)
@@ -393,8 +367,10 @@ namespace ShaderSimulator
                             {
                                 foreach (var key in _fragments[x, y].Keys)
                                 {
-                                    SetAttribute(_activeFragmentShader, key, _fragments[x, y][key][i]);
+                                    _activeFragmentShader.GetType().GetProperty(key).SetValue(_activeFragmentShader, _fragments[x, y][key][i]);
                                 }
+
+
                                 _activeFragmentShader.Main();
                                 foreach (var outValue in _activeFragmentShader.GetOutValues())
                                 {
@@ -404,16 +380,20 @@ namespace ShaderSimulator
                                             Math.Min((int)(((Vector4)outValue.Value).R * 255), 255),
                                             Math.Min((int)(((Vector4)outValue.Value).G * 255), 255),
                                             Math.Min((int)(((Vector4)outValue.Value).B * 255), 255));
-                                        bmp.SetPixel(x, y, color);
+                                        Bmp.SetPixel(x, y, color);
                                     }
                                 }
                             }
                         }
                     }
+                    else
+                    {
+                        Bmp.SetPixel(x, y, Color.Transparent);
+                    }
                 }
-            }
+        }
 
-            return bmp;
+            return Bmp;
         }
     }
 }
