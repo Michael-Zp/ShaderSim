@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using BarycentricCudaLib;
 using ShaderUtils;
 using ShaderUtils.Attributes;
@@ -36,7 +37,7 @@ namespace ShaderSimulator
         private List<float>[,] _depths;
         private Dictionary<string, IList>[,] _fragments;
         private int[,] _fragmentCount;
-        private BarycentricCuda barycentricCuda;
+        private BarycentricCudaMultiple barycentricCudaMultiple;
 
 
         public RenderSimulator()
@@ -56,7 +57,7 @@ namespace ShaderSimulator
 
         public override void OnResize(int width, int height)
         {
-            barycentricCuda = new BarycentricCuda(width, height);
+            barycentricCudaMultiple = new BarycentricCudaMultiple(width, height);
         }
 
         public override void ActivateShader(VertexShader vertex, FragmentShader fragment)
@@ -147,28 +148,27 @@ namespace ShaderSimulator
         public void DrawElementsInstanced(int instanceCount = 1)
         {
             Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Reset();
             stopwatch.Start();
 
             SetUniforms();
-            Console.WriteLine($"SetUniforms Time: \t\tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
-            stopwatch.Restart();
+            //Console.WriteLine($"SetUniforms Time: \t\tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            //stopwatch.Restart();
 
             CalculateVertexStep(instanceCount);
-            Console.WriteLine($"CalculateVertexStep Time: \tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
-            stopwatch.Restart();
+            //Console.WriteLine($"CalculateVertexStep Time: \tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            //stopwatch.Restart();
 
             GeneratePrimitives();
-            Console.WriteLine($"GeneratePrimitives Time: \tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
-            stopwatch.Restart();
+            //Console.WriteLine($"GeneratePrimitives Time: \tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            //stopwatch.Restart();
 
             CalculateFragments();
-            Console.WriteLine($"CalculateFragments Time: \tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
-            stopwatch.Restart();
+            //Console.WriteLine($"CalculateFragments Time: \tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            //stopwatch.Restart();
 
             RenderResult = CalculateFragmentStep();
-            Console.WriteLine($"RenderResult Time: \t\tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
-            stopwatch.Restart();
+            //Console.WriteLine($"RenderResult Time: \t\tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
+            //stopwatch.Restart();
 
             stopwatch.Stop();
             Console.WriteLine($"Time: \t\t\t\tTicks = {stopwatch.Elapsed.Ticks}; Ms = {stopwatch.Elapsed.TotalMilliseconds}");
@@ -263,73 +263,11 @@ namespace ShaderSimulator
 
         private void CalculateFragments()
         {
-            //Vector2[,] positions = new Vector2[Width, Height];
-
-            _depths = new List<float>[Width, Height];
-            _fragments = new Dictionary<string, IList>[Width, Height];
-            _fragmentCount = new int[Width, Height];
-
-            List<List<BarycentricReturn>> interpolated = new List<List<BarycentricReturn>>();
+            BarycentricReturnMultiple interpolated = barycentricCudaMultiple.Execute(_primitives, _primitives[0][0].Keys);
             
-            interpolated = barycentricCuda.ExecuteMultiple(_primitives, out double totalOnlyKernelTime);
-            
-            Console.WriteLine("Cuda Kernel Time: " + totalOnlyKernelTime);
-
-            foreach (var inter in interpolated)
-            {
-                foreach (var item in inter)
-                {
-                    if (_depths[item.X, item.Y] == null)
-                    {
-                        _depths[item.X, item.Y] = new List<float>();
-                        _fragments[item.X, item.Y] = new Dictionary<string, IList>();
-                        _fragmentCount[item.X, item.Y] = 0;
-                    }
-
-                    _depths[item.X, item.Y].Add(item.Depth);
-                    _fragmentCount[item.X, item.Y]++;
-
-                    int currentIndex = 0;
-
-                    foreach (var key in _primitives[0][0].Keys)
-                    {
-                        if (key == VertexShader.PositionName)
-                        {
-                            continue;
-                        }
-
-                        if (!_fragments[item.X, item.Y].ContainsKey(key))
-                        {
-                            _fragments[item.X, item.Y].Add(key, new List<object>());
-                        }
-
-                        switch (_primitives[0][0][key])
-                        {
-                            case float _:
-                                {
-                                    _fragments[item.X, item.Y][key].Add((float)item.FragmentData[currentIndex]);
-                                    break;
-                                }
-                            case Vector2 _:
-                                {
-                                    _fragments[item.X, item.Y][key].Add((Vector2)item.FragmentData[currentIndex]);
-                                    break;
-                                }
-                            case Vector3 _:
-                                {
-                                    _fragments[item.X, item.Y][key].Add((Vector3)item.FragmentData[currentIndex]);
-                                    break;
-                                }
-                            case Vector4 _:
-                                {
-                                    _fragments[item.X, item.Y][key].Add((Vector4)item.FragmentData[currentIndex]);
-                                    break;
-                                }
-                        }
-                        currentIndex++;
-                    }
-                }
-            }
+            _depths = interpolated.Depths;
+            _fragments = interpolated.FragmentData;
+            _fragmentCount = interpolated.FragmentCount;
         }
 
         [StructLayout(LayoutKind.Explicit)]
@@ -346,6 +284,7 @@ namespace ShaderSimulator
         {
             int[] imageData = new int[_fragments.GetLength(0) * _fragments.GetLength(1)];
             Vector4ToInt vec4ToInt = new Vector4ToInt();
+
             for (int x = 0; x < _fragments.GetLength(0); x++)
             {
                 for (int y = 0; y < _fragments.GetLength(1); y++)
@@ -388,6 +327,7 @@ namespace ShaderSimulator
                                 }
 
                                 _activeFragmentShader.Main();
+
                                 foreach (var outValue in _activeFragmentShader.GetOutValues())
                                 {
                                     if (outValue.Key == FragmentShader.ColorName)
@@ -405,6 +345,7 @@ namespace ShaderSimulator
                     }
                 }
             }
+
 
             return new Bitmap(Width, Height, Width, System.Drawing.Imaging.PixelFormat.Format32bppArgb, Marshal.UnsafeAddrOfPinnedArrayElement(imageData, 0));
         }

@@ -48,12 +48,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BarycentricCudaMultiple.cs" />
     <Compile Include="BarycentricCuda.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="baryMultiple.cu" />
     <None Include="bary.cu" />
     <EmbeddedResource Include="bary.ptx" />
+    <EmbeddedResource Include="baryMultiple.ptx" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
